@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Notas — Inicio</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <script src="/js/api.js"></script>
+    <script src="/js/index.js"></script>
+    <!-- Header: logo y acciones principales -->
+    <div class="header">
+        <div class="center">
+            <h1>📝 Notes</h1>
+        </div>
+        <div class="right">
+
+        </div>
+    </div>
+
+    <!-- Hero section: llamado a la acción limpio y centrado -->
+    <main class="container">
+        <section class="content" style="text-align:center; padding: 48px 12px;">
+            <h1 style="font-size:32px; margin-bottom:12px;">Comparte ideas. Guarda pensamientos.</h1>
+            <p style="color:var(--text-secondary); max-width:720px; margin: 0 auto 18px;">
+                Notas es un espacio ligero para escribir, reflexionar y compartir. Crea notas rápidas, comparte públicamente o manténlas privadas.
+            </p>
+            <div style="display:flex; gap:12px; justify-content:center; margin-top:18px;">
+                <a href="/public" class="btn-register">Ver notas</a>
+            </div>
+        </section>
+
+        <!-- Sección de características: tres columnas sencillas -->
+        <section style="margin-top:36px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
+                <div class="note-card">
+                    <h3 class="note-title">Rápido y minimalista</h3>
+                    <p class="note-content">Diseñado para capturar ideas sin distracciones. Interfaz clara y utilidades esenciales.</p>
+                </div>
+                <div class="note-card">
+                    <h3 class="note-title">Privacidad flexible</h3>
+                    <p class="note-content">Decide si tus notas son públicas, solo para amigos o privadas para ti.</p>
+                </div>
+                <div class="note-card">
+                    <h3 class="note-title">Comparte con facilidad</h3>
+                    <p class="note-content">Comparte enlaces a notas o explora contenido público de otros usuarios.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer corto con enlaces legales -->
+        <footer class="site-footer" style="margin-top:48px; text-align:center; color:var(--text-secondary);">
+            <small>&copy; <span id="year"></span> Notas — <a href="/html/privacy.html">Política de privacidad</a> • <a href="/html/cookies.html">Cookies</a></small>
+        </footer>
+    </main>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
