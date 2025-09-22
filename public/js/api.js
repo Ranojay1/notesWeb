@@ -25,7 +25,7 @@ class apiLoader {
         if(!this.isAuthenticated()) return null;
         return this.user;
     }
-
+    
     async register(user, email, pass) {
         try {
             const response = await fetch(this.apiBase + '/registerUser', {
@@ -111,6 +111,24 @@ class apiLoader {
             return { success: false };
         }
     }
+
+    async getPublicComments(noteId, limit = 20, offset = 0) {
+        try {
+            const response = await fetch(this.apiBase + '/getPublicComments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user: this.user, password: this.pass, id: noteId, limit, offset })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching public comments:', error);
+            return [];
+        }
+    }
+
     async isFollowing(user) {
         if(!this.isAuthenticated()) return false;
         try {

@@ -380,6 +380,45 @@ textarea.form-control {
     color: var(--text-secondary);
 }
 
+/* Comentarios dentro de una nota */
+.note-card .comments-section {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.note-card .comment-card {
+    background: #fafafa;
+    border: 1px solid var(--border-color);
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.note-card .comment-author {
+    color: var(--primary-color);
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.note-card .comment-content {
+    color: var(--text-primary);
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.note-card .add-comment textarea {
+    width: 100%;
+    min-height: 80px;
+    margin-bottom: 8px;
+}
+
+.note-card .add-comment .btn {
+    float: right;
+}
+
 /* Loading y Estados */
 .loading {
     display: flex;
