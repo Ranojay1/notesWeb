@@ -129,6 +129,60 @@ class apiLoader {
         }
     }
 
+    async comment(noteId, content) {
+        if(!this.isAuthenticated()) return { success: false, message: 'Not authenticated' };
+        try {
+            const response = await fetch(this.apiBase + '/sendComment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: this.user, password: this.pass, id: noteId, content })
+            });
+            if (response.status === 201) return { success: true };
+            // intentar parsear JSON si hay cuerpo
+            let data;
+            try { data = await response.json(); } catch (e) { data = { success: false, status: response.status } }
+            return { success: !!(data && data.success), data };
+        } catch (error) {
+            console.error('Error sending comment:', error);
+            return { success: false, error: String(error) };
+        }
+    }
+
+    async canComment(noteId) {
+        if(!this.isAuthenticated()) return false;
+        try {
+            const response = await fetch(this.apiBase + '/canComment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user: this.user, password: this.pass, noteId })
+            });
+            const data = (await response.json()).canComment;
+            return data;
+        } catch (error) {
+            console.error('Error checking canComment status:', error);
+            return false;
+        }
+    }
+
+    async getComments(noteId, limit = 20, offset = 0) {
+        try {
+            const response = await fetch(this.apiBase + '/getPrivateComments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user: this.user, password: this.pass, id: noteId, limit, offset })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching public comments:', error);
+            return [];
+        }
+    }
+
     async isFollowing(user) {
         if(!this.isAuthenticated()) return false;
         try {

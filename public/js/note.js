@@ -46,17 +46,15 @@ window.addEventListener('DOMContentLoaded', async () => {
             <div class="note-content">${note.content}</div>
         `;
         notes_site.appendChild(noteDiv);
-
-        // cargar comentarios
-
-        const rawComments = note.privacy === 'public' ? await apiInstance.getPublicComments(noteId) : [];
-
         const escapeHtml = (str = '') => String(str)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+
+        // cargar comentarios
+        const rawComments = note.privacy === 'public' ? await apiInstance.getPublicComments(noteId) :await  apiInstance.getComments(noteId);
 
         const comments = (rawComments || []).map(c => ({
             id: c.id ?? c.comment_id ?? c.note_id ?? null,
@@ -95,13 +93,12 @@ window.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 `;
             }));
-
             commentsDiv.innerHTML = `
                 <h3>Comentarios</h3>
                 <div class="comments-list">
                     ${rows.join('')}
                 </div>
-                ${auth ? `
+                ${await apiInstance.canComment(noteId) ? `
                 <div class="add-comment">
                     <h4>Añadir un comentario</h4>
                     <textarea id="commentContent" placeholder="Escribe tu comentario aquí..."></textarea>
@@ -115,19 +112,28 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (auth) {
             const submitBtn = commentsDiv.querySelector('#submitComment');
             const textarea = commentsDiv.querySelector('#commentContent');
-            if (submitBtn && textarea) {
+                if (submitBtn && textarea) {
                 submitBtn.addEventListener('click', async () => {
                     const content = textarea.value.trim();
                     if (!content) return;
                     try {
                         submitBtn.disabled = true;
-                        // if apiInstance has sendComment, use it. Fallback: reload.
-                        if (typeof apiInstance.sendComment === 'function') {
-                            await apiInstance.sendComment(noteId, content);
-                            // re-fetch comments and re-render simple approach: reload page
-                            window.location.reload();
+                        // Llamar a la función `comment` del apiInstance
+                        if (typeof apiInstance.comment === 'function') {
+                            const res = await apiInstance.comment(noteId, content);
+                            if (res && (res.success === true || res.success === 'success')) {
+                                // Comentario aceptado: recargar comentarios (simple reload)
+                                window.location.reload();
+                                return;
+                            } else {
+                                console.error('Fallo al enviar comentario', res);
+                                submitBtn.disabled = false;
+                                return;
+                            }
                         } else {
+                            // Si no existe el método, fallback a recargar (no ideal)
                             window.location.reload();
+                            return;
                         }
                     } catch (e) {
                         console.error('Error enviando comentario', e);
