@@ -11,6 +11,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         if(auth) {
             rightDiv.innerHTML = `
                 <span>Bienvenido, ${apiInstance.user}</span>
+                <a href="/createNote"><button class="btn btn-primary">Crear nota</button></a>
                 <button id="logoutBtn" class="btn-logout">Logout</button>
             `;
             document.getElementById('logoutBtn').addEventListener('click', () => {

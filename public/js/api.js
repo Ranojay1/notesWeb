@@ -69,15 +69,16 @@ class apiLoader {
     }
 
 
-    async getFollowerNotes() {
+    async getFollowerNotes(limit = 20, offset = 0) {
         if(!this.isAuthenticated()) return [];
         try {
+            const following = await this.getFollowingUsers();
             const response = await fetch(this.apiBase + '/getFollowerNotes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, followingUsers: await this.getFollowingUsers() })
+                body: JSON.stringify({ user: this.user, password: this.pass, followingUsers: following, limit, offset })
             });
             const data = await response.json();
             return data;
@@ -201,7 +202,7 @@ class apiLoader {
         }
     }
 
-    async getMyNotes(){
+    async getMyNotes(limit = 20, offset = 0){
         if(!this.isAuthenticated()) return [];
         try {
             const response = await fetch(this.apiBase + '/getNotes', {
@@ -209,7 +210,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass })
+                body: JSON.stringify({ user: this.user, password: this.pass, limit, offset })
             });
             const data = await response.json();
             return data;
@@ -219,7 +220,7 @@ class apiLoader {
         }
     }
 
-    async getFriendNotes(){
+    async getFriendNotes(limit = 20, offset = 0){
         if(!this.isAuthenticated()) return [];
         try {
             const response = await fetch(this.apiBase + '/getFriendNotes', {
@@ -227,7 +228,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass })
+                body: JSON.stringify({ user: this.user, password: this.pass, limit, offset })
             });
             const data = await response.json();
             return data;
@@ -277,8 +278,46 @@ class apiLoader {
         this.loggedIn = true;
     }
 
-    async getPublicNotes(id) {
-        const body = JSON.stringify({ id });
+    async createNote({ title, content, privacy }) {
+        if(!this.isAuthenticated()) return null;
+        try {
+            const response = await fetch(this.apiBase + '/sendNewNote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user: this.user, password: this.pass, title, content, privacy })
+            });
+            if (!response.ok) {
+                // intentar leer mensaje de error en texto
+                let text = null;
+                try { text = await response.text(); } catch (e) { /* ignore */ }
+                return { success: false, status: response.status, message: text };
+            }
+
+            // Si el backend responde JSON, parsearlo; si responde texto (p.ej. "Created"), devolver objeto uniforme
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await response.json();
+                return data;
+            }
+
+            // fallback: leer como texto
+            let text = null;
+            try { text = await response.text(); } catch (e) { /* ignore */ }
+            // Si el texto contiene un id numérico, devolverlo
+            const maybeId = parseInt((text || '').trim());
+            if (!isNaN(maybeId)) return { success: true, id: maybeId, message: text };
+            // Respuesta tipo "Created" -> devolver formato consistente
+            return { success: true, message: text };
+        } catch (error) {
+            console.error('Error creating note:', error);
+            return null;
+        }
+    }
+
+    async getPublicNotes(id, limit = 20, offset = 0) {
+        const body = JSON.stringify({ id, limit, offset });
         try {
             const response = await fetch(this.apiBase + '/getPublicNotes', {
                 method: 'POST',
