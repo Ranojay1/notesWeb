@@ -26,10 +26,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             `;
         }
         let note;
-        note = (await apiInstance.getPublicNotes(noteId))[0];
-        if(!note) note = (await apiInstance.getFollowerNotes(noteId))[0];
-        if(!note) note = (await apiInstance.getMyNotes(noteId))[0];
-        if(!note) return window.location.href = '/';
+        note = (await apiInstance.getNote(noteId));
+        console.log(note);
+        //if(!note) return window.location.href = '/';
         const noteDiv = document.createElement('div');
         noteDiv.className = 'note-card';
         noteDiv.innerHTML = `

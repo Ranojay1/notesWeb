@@ -316,6 +316,28 @@ class apiLoader {
         }
     }
 
+    async getNote(id) {
+        const body = JSON.stringify({ id, user: this.user, password: this.pass });
+        try {
+            const response = await fetch(this.apiBase + '/getNote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body
+            });
+            if (!response.ok) {
+                // Si el endpoint no existe o hay error, retorna null
+                return null;
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching note:', error);
+            return null;
+        }
+    }
+
     async getPublicNotes(id, limit = 20, offset = 0) {
         const body = JSON.stringify({ id, limit, offset });
         try {
