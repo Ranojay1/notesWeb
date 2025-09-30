@@ -1,7 +1,7 @@
 class apiLoader {
     constructor() {
         // Centraliza la URL base de la API aquí
-        this.apiBase = 'https://api.notas.cubenet.fun/api';
+        this.apiBase = 'https://api.thinkverse.site/api';
         //this.load();
     }
     async load() {
