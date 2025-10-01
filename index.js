@@ -14,6 +14,20 @@ for(const file of fs.readdirSync('./public/html').filter(f => f.endsWith('.html'
         res.sendFile(path.join(__dirname, 'public', 'html', file));
     });
 }
+let lastVersion;
+app.get("/download", (req, res) => {
+    if(!lastVersion) {
+        for(const file of fs.readdirSync('./public/apk').filter(f => f.endsWith('.apk'))) {
+            const version = file.replace('NotesApp_v', '').replace('.apk', '');
+            if (version > lastVersion || !lastVersion) {
+                lastVersion = version;
+            }
+            console.log(version)
+        }
+    }
+    const file = path.join(__dirname, 'public', 'apk', 'NotesApp_v' + lastVersion + '.apk');
+    res.download(file);
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
