@@ -19,8 +19,8 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         } else {
             rightDiv.innerHTML = `
-                <a href="/login"><button class="btn btn-outline btn-login">Iniciar sesión</button></a>
-                <a href="/register"><button class="btn btn-outline btn-register">Registrarse</button></a>
+                <a href="/login"><button class="btn btn-primary">Iniciar sesión</button></a>
+                <a href="/register"><button class="btn btn-primary" style="background: #10b981; margin-left: 8px;">Registrarse</button></a>
             `;
         }
     })();

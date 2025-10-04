@@ -6,15 +6,31 @@ class apiLoader {
     }
     async load() {
         this.user = localStorage.getItem('user') || ''; 
-        this.pass = localStorage.getItem('pass') || ''; 
-        if(!this.user || !this.pass) this.loggedIn = false;
-        else {
-            const loginStatus = await this.checkLogin();
-            this.loggedIn = !!(loginStatus && loginStatus.success);
+        this.pass = localStorage.getItem('pass') || '';
+        this.isDiscordAuth = this.pass && this.pass.startsWith('DISCORD_');
+        this.discordId = this.isDiscordAuth ? this.pass.replace('DISCORD_', '') : null;
+        
+        if(!this.user || !this.pass) {
+            this.loggedIn = false;
+        } else {
+            // Cachear el estado de login para no validar múltiples veces
+            if (this._loginCheckCache === undefined) {
+                const loginStatus = await this.checkLogin();
+                this._loginCheckCache = !!(loginStatus && loginStatus.success);
+            }
+            this.loggedIn = this._loginCheckCache;
             if(!this.loggedIn) this.logout();
         }
 
         return this;
+    }
+    
+    // Helper para obtener las credenciales en el formato correcto
+    getAuthPayload() {
+        if (this.isDiscordAuth) {
+            return { user: this.user, discordId: this.discordId };
+        }
+        return { user: this.user, password: this.pass };
     }
 
     isAuthenticated() {
@@ -58,7 +74,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass })
+                body: JSON.stringify({ ...this.getAuthPayload() })
             });
             const data = await response.json();
             return data.following;
@@ -78,7 +94,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, followingUsers: following, limit, offset })
+                body: JSON.stringify({ ...this.getAuthPayload(), followingUsers: following, limit, offset })
             });
             const data = await response.json();
             return data;
@@ -91,6 +107,28 @@ class apiLoader {
     async checkLogin() {
         const {user, pass} = this;
         try {
+            // Si es autenticación de Discord, usar endpoint especial
+            if (pass && pass.startsWith('DISCORD_')) {
+                const discordId = pass.replace('DISCORD_', '');
+                const response = await fetch(this.apiBase + '/discordLogin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: user, discordId })
+                });
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { success: text.trim() === 'success' };
+                }
+                return data;
+            }
+            
+            // Login normal con usuario y contraseña
             const response = await fetch(this.apiBase + '/login', {
                 method: 'POST',
                 headers: {
@@ -120,7 +158,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, id: noteId, limit, offset })
+                body: JSON.stringify({ ...this.getAuthPayload(), id: noteId, limit, offset })
             });
             const data = await response.json();
             return data;
@@ -136,7 +174,7 @@ class apiLoader {
             const response = await fetch(this.apiBase + '/sendComment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user: this.user, password: this.pass, id: noteId, content })
+                body: JSON.stringify({ ...this.getAuthPayload(), id: noteId, content })
             });
             if (response.status === 201) return { success: true };
             // intentar parsear JSON si hay cuerpo
@@ -157,7 +195,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, noteId })
+                body: JSON.stringify({ ...this.getAuthPayload(), noteId })
             });
             const data = (await response.json()).canComment;
             return data;
@@ -174,7 +212,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, id: noteId, limit, offset })
+                body: JSON.stringify({ ...this.getAuthPayload(), id: noteId, limit, offset })
             });
             const data = await response.json();
             return data;
@@ -192,7 +230,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, target: user })
+                body: JSON.stringify({ ...this.getAuthPayload(), target: user })
             });
             const data = (await response.json()).isFollowing;
             return data;
@@ -210,7 +248,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, limit, offset })
+                body: JSON.stringify({ ...this.getAuthPayload(), limit, offset })
             });
             const data = await response.json();
             return data;
@@ -228,7 +266,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, limit, offset })
+                body: JSON.stringify({ ...this.getAuthPayload(), limit, offset })
             });
             const data = await response.json();
             return data;
@@ -247,7 +285,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass })
+                body: JSON.stringify({ ...this.getAuthPayload() })
             });
             const data = await response.json();
             return data;
@@ -286,7 +324,7 @@ class apiLoader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: this.user, password: this.pass, title, content, privacy })
+                body: JSON.stringify({ ...this.getAuthPayload(), title, content, privacy })
             });
             if (!response.ok) {
                 // intentar leer mensaje de error en texto
@@ -317,7 +355,7 @@ class apiLoader {
     }
 
     async getNote(id) {
-        const body = JSON.stringify({ id, user: this.user, password: this.pass });
+        const body = JSON.stringify({ id, ...this.getAuthPayload() });
         try {
             const response = await fetch(this.apiBase + '/getNote', {
                 method: 'POST',
