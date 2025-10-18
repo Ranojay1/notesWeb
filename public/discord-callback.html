@@ -41,24 +41,68 @@
 
     <script>
         (async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const error = urlParams.get('error');
-
-            if (error) {
-                alert('Error de autenticación: ' + error);
-                window.location.href = '/html/login.html';
-                return;
-            }
-
-            if (!code) {
-                alert('No se recibió código de autenticación');
-                window.location.href = '/html/login.html';
-                return;
-            }
-
             try {
-                // Enviar código al backend (el backend manejará el OAuth de forma segura)
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const error = urlParams.get('error');
+                const state = urlParams.get('state');
+
+                console.log('Discord callback params:', { code: code ? 'present' : 'missing', error, state });
+
+                const isAndroidApp = state === 'android';
+
+                if (error) {
+                    console.log('OAuth error detected:', error);
+                    if (isAndroidApp) {
+                        const deepLink = 'thinkverse://discord-callback?error=' + encodeURIComponent(error);
+                        console.log('Redirecting to app with error:', deepLink);
+                        window.location.href = deepLink;
+                    } else {
+                        alert('Error de autenticación: ' + error);
+                        window.location.href = '/html/login.html';
+                    }
+                    return;
+                }
+
+                if (!code) {
+                    console.log('No code received');
+                    if (isAndroidApp) {
+                        const deepLink = 'thinkverse://discord-callback?error=no_code';
+                        console.log('Redirecting to app with no_code error:', deepLink);
+                        window.location.href = deepLink;
+                    } else {
+                        alert('No se recibió código de autenticación');
+                        window.location.href = '/html/login.html';
+                    }
+                    return;
+                }
+
+                if (isAndroidApp) {
+                    const deepLink = 'thinkverse://discord-callback?code=' + encodeURIComponent(code);
+                    console.log('Redirecting to app with code:', deepLink);
+                    
+                    // Mostrar mensaje antes de redirigir
+                    document.querySelector('.loading p').textContent = 'Abriendo app...';
+                    
+                    // Redirigir inmediatamente
+                    window.location.href = deepLink;
+                    
+                    // Fallback si la app no se abre en 2 segundos
+                    setTimeout(() => {
+                        document.querySelector('.loading p').textContent = 'Si la app no se abre, haz clic aquí:';
+                        const link = document.createElement('a');
+                        link.href = deepLink;
+                        link.textContent = 'Abrir Thinkverse';
+                        link.style.display = 'block';
+                        link.style.marginTop = '1rem';
+                        link.style.color = '#5865F2';
+                        document.querySelector('.loading').appendChild(link);
+                    }, 2000);
+                    
+                    return;
+                }
+
+                // Flujo web normal
                 const response = await fetch(window.AppConfig.apiUrl + '/api/discordCallback', {
                     method: 'POST',
                     headers: {
@@ -70,7 +114,6 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Guardar datos y redirigir
                     sessionStorage.setItem('discordLoginData', JSON.stringify(data));
                     window.location.href = '/html/login.html';
                 } else {

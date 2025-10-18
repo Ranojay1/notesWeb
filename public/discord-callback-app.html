@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abriendo Thinkverse...</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #5865F2;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        a {
+            color: white;
+            text-decoration: underline;
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+        .error {
+            background: #ED4245;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>Abriendo Thinkverse...</h2>
+        <p id="message">Serás redirigido a la app en un momento</p>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        (async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+
+            const messageEl = document.getElementById('message');
+            const errorEl = document.getElementById('error');
+
+            console.log('App callback - code:', code ? 'present' : 'missing', 'error:', error);
+
+            if (error) {
+                console.error('OAuth error:', error);
+                errorEl.textContent = 'Error de autenticación: ' + error;
+                errorEl.style.display = 'block';
+                messageEl.textContent = 'No se pudo completar la autenticación';
+                
+                const deepLink = 'thinkverse://discord-callback?error=' + encodeURIComponent(error);
+                window.location.href = deepLink;
+                return;
+            }
+
+            if (!code) {
+                console.error('No code received');
+                errorEl.textContent = 'No se recibió código de autenticación';
+                errorEl.style.display = 'block';
+                messageEl.textContent = 'Inténtalo de nuevo';
+                
+                const deepLink = 'thinkverse://discord-callback?error=no_code';
+                window.location.href = deepLink;
+                return;
+            }
+
+            // Redirigir a la app con el código
+            const deepLink = 'thinkverse://discord-callback?code=' + encodeURIComponent(code);
+            console.log('Redirecting to:', deepLink);
+            
+            messageEl.textContent = 'Abriendo Thinkverse...';
+            window.location.href = deepLink;
+
+            // Fallback si la app no se abre
+            setTimeout(() => {
+                messageEl.innerHTML = 'Si la app no se abrió automáticamente:<br><a href="' + deepLink + '">Haz clic aquí para abrir Thinkverse</a>';
+                document.querySelector('.spinner').style.display = 'none';
+            }, 2000);
+        })();
+    </script>
+</body>
+</html>
