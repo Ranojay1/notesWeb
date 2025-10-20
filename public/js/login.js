@@ -15,6 +15,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const discordLoginData = sessionStorage.getItem('discordLoginData');
         if (discordLoginData) {
             const data = JSON.parse(discordLoginData);
+            console.log('📦 Full Discord login data:', data);
             sessionStorage.removeItem('discordLoginData');
             
             if (data.linked && data.username) {
@@ -22,13 +23,23 @@ window.addEventListener('DOMContentLoaded', async () => {
                 console.log('Discord user linked to:', data.username);
                 
                 try {
+                    // Obtener el discordId del objeto correcto
+                    const discordId = data.discordId || (data.discord && data.discord.id);
+                    console.log('🔑 Discord ID extracted:', discordId);
+                    console.log('🔍 data.discordId:', data.discordId);
+                    console.log('🔍 data.discord:', data.discord);
+                    
+                    if (!discordId) {
+                        throw new Error('Discord ID not found in login data');
+                    }
+                    
                     // Verificar login con Discord ID
                     const response = await fetch(window.AppConfig.apiUrl + '/api/discordLogin', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             username: data.username,
-                            discordId: data.discord.id
+                            discordId: discordId
                         })
                     });
 
@@ -37,7 +48,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                     if (loginResult.success) {
                         // Guardar en localStorage con un identificador especial
                         localStorage.setItem('user', data.username);
-                        localStorage.setItem('pass', 'DISCORD_' + data.discord.id);
+                        localStorage.setItem('pass', 'DISCORD_' + discordId);
                         localStorage.setItem('discord_auth', 'true');
                         
                         console.log('✅ Discord login successful, redirecting...');
@@ -52,7 +63,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                 return;
             } else {
                 // Guardar datos de Discord para vincular
-                sessionStorage.setItem('discordData', JSON.stringify(data.discord));
+                const discordData = data.discord || data;
+                sessionStorage.setItem('discordData', JSON.stringify(discordData));
             }
         }
 
