@@ -7,22 +7,51 @@
     <script src="/js/theme.js"></script>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        :root {
+            --note-bg: #f8fafc;
+            --note-border: #e2e8f0;
+            --note-text: #1e293b;
+            --note-meta: #64748b;
+            --note-hover: #ffffff;
+            --comment-bg: #f8fafc;
+            --comment-border: #e2e8f0;
+            --comment-text: #475569;
+            --input-bg: #ffffff;
+            --empty-bg: #f8fafc;
+        }
+
+        :root.dark-mode {
+            --note-bg: #1e293b;
+            --note-border: #334155;
+            --note-text: #f1f5f9;
+            --note-meta: #94a3b8;
+            --note-hover: #334155;
+            --comment-bg: #1e293b;
+            --comment-border: #334155;
+            --comment-text: #cbd5e1;
+            --input-bg: #0f172a;
+            --empty-bg: #1e293b;
+        }
+
         .note-container {
             max-width: 900px;
             margin: 40px auto;
-            padding: 0 20px;
+            padding: 40px;
+            background: var(--note-bg);
+            border-radius: 16px;
+            border: 2px solid var(--note-border);
         }
 
         .note-header {
             margin-bottom: 40px;
             padding-bottom: 20px;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+            border-bottom: 1px solid var(--note-border);
         }
 
         .note-title {
             font-size: 32px;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--note-text);
             margin: 0 0 20px 0;
         }
 
@@ -31,7 +60,7 @@
             gap: 20px;
             flex-wrap: wrap;
             align-items: center;
-            color: #64748b;
+            color: var(--note-meta);
             font-size: 14px;
         }
 
@@ -50,13 +79,13 @@
         }
 
         .note-content {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: var(--radius);
+            background: var(--note-bg);
+            border: 2px solid var(--note-border);
+            border-radius: 12px;
             padding: 30px;
             margin-bottom: 40px;
             line-height: 1.8;
-            color: #1e293b;
+            color: var(--note-text);
             white-space: pre-wrap;
             word-wrap: break-word;
             font-size: 16px;
@@ -65,20 +94,20 @@
         .comments-section {
             margin-top: 40px;
             padding-top: 40px;
-            border-top: 2px solid #e2e8f0;
+            border-top: 2px solid var(--note-border);
         }
 
         .comments-title {
             font-size: 24px;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--note-text);
             margin-bottom: 30px;
         }
 
         .comment-form {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: var(--radius);
+            background: var(--comment-bg);
+            border: 2px solid var(--comment-border);
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
         }
@@ -87,10 +116,10 @@
             width: 100%;
             min-height: 100px;
             padding: 12px 15px;
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
+            background: var(--input-bg);
+            border: 2px solid var(--note-border);
             border-radius: 8px;
-            color: #1e293b;
+            color: var(--note-text);
             font-family: inherit;
             font-size: 14px;
             resize: vertical;
@@ -98,13 +127,13 @@
         }
 
         .comment-textarea::placeholder {
-            color: #94a3b8;
+            color: var(--note-meta);
         }
 
         .comment-textarea:focus {
             outline: none;
             border-color: var(--secondary);
-            background: #ffffff;
+            background: var(--input-bg);
             box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
         }
 
@@ -140,16 +169,16 @@
         .btn-cancel {
             padding: 10px 20px;
             background: transparent;
-            border: 2px solid #cbd5e1;
+            border: 2px solid var(--note-border);
             border-radius: 6px;
-            color: #475569;
+            color: var(--comment-text);
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .btn-cancel:hover {
-            background: #f8fafc;
-            border-color: #1e293b;
+            background: var(--note-hover);
+            border-color: var(--note-text);
         }
 
         .comments-list {
@@ -158,15 +187,15 @@
         }
 
         .comment-item {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            background: var(--comment-bg);
+            border: 2px solid var(--comment-border);
+            border-radius: 12px;
             padding: 20px;
             transition: all 0.3s ease;
         }
 
         .comment-item:hover {
-            background: #ffffff;
+            background: var(--note-hover);
             border-color: var(--secondary);
             box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
         }
@@ -192,7 +221,7 @@
 
         .comment-author {
             font-weight: 600;
-            color: #1e293b;
+            color: var(--note-text);
             cursor: pointer;
         }
 
@@ -202,12 +231,12 @@
 
         .comment-time {
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--note-meta);
             margin-left: 10px;
         }
 
         .comment-text {
-            color: #475569;
+            color: var(--comment-text);
             line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -221,7 +250,7 @@
         }
 
         .comment-action {
-            color: #94a3b8;
+            color: var(--note-meta);
             cursor: pointer;
             transition: 0.2s;
         }
@@ -233,10 +262,10 @@
         .empty-comments {
             text-align: center;
             padding: 40px 20px;
-            color: #64748b;
-            background: #f8fafc;
+            color: var(--note-meta);
+            background: var(--empty-bg);
             border-radius: 10px;
-            border: 2px dashed #cbd5e1;
+            border: 2px dashed var(--note-border);
         }
 
         .empty-icon {
@@ -247,7 +276,7 @@
         .loading {
             text-align: center;
             padding: 40px;
-            color: #1e293b;
+            color: var(--note-text);
             font-weight: 600;
         }
 
@@ -270,6 +299,11 @@
         }
 
         @media (max-width: 768px) {
+            .note-container {
+                margin: 20px;
+                padding: 20px;
+            }
+
             .note-title {
                 font-size: 24px;
             }
@@ -347,6 +381,8 @@
         </div>
     </div>
 
+    <script src="/js/api.js?v=5"></script>
+    <script src="/js/header.js?v=4"></script>
     <script src="/js/note.js?v=3"></script>
 </body>
 </html>
