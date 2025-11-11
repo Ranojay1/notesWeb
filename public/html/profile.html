@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil - Thinkverse</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/theme.js"></script>
+    <link rel="stylesheet" href="/css/style.css?v=3">
     <script src="/js/api.js?v=5"></script>
-    <script src="/js/header.js?v=1"></script>
+    <script src="/js/header.js?v=4"></script>
     <style>
         .profile-container {
             max-width: 900px;
@@ -44,13 +45,14 @@
             font-size: 32px;
             font-weight: 700;
             margin: 0 0 10px 0;
-            color: black;
+            color: #000;
         }
 
         .profile-discord {
             font-size: 14px;
             opacity: 0.9;
             margin-bottom: 20px;
+            color: #000;
         }
 
         .profile-actions {
@@ -67,29 +69,31 @@
             cursor: pointer;
             font-weight: 600;
             transition: 0.3s;
-            color: black;
+            color: #000;
         }
         .btn-action a {
-            color: black;
+            color: #000;
             text-decoration: none;
         }
         .stat div {
-            color: #1e293b;
+            color: #000;
         }
 
         #btnAddFriend {
             background-color: #64748b;
-            color: black;
+            color: #fff;
         }
 
         .btn-action.primary {
-            background: white;
-            color: var(--secondary);
+            background: var(--secondary);
+            color: #000;
+            border-color: var(--secondary);
         }
 
         .btn-action.primary:hover {
             background: transparent;
-            color: white;
+            color: #fff;
+            border-color: #fff;
         }
 
         .stats-row {
@@ -268,6 +272,35 @@
                 gap: 15px;
                 justify-content: space-around;
             }
+        }
+
+        /* Dark mode overrides */
+        :root.dark-mode .profile-username,
+        :root.dark-mode .profile-discord,
+        :root.dark-mode .btn-action,
+        :root.dark-mode .btn-action a,
+        :root.dark-mode .stat div {
+            color: #fff !important;
+        }
+
+        :root.dark-mode #btnAddFriend {
+            color: #fff;
+        }
+
+        :root.dark-mode .btn-action {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        :root.dark-mode .btn-action.primary {
+            background: var(--secondary);
+            color: #000;
+            border-color: var(--secondary);
+        }
+
+        :root.dark-mode .btn-action.primary:hover {
+            background: transparent;
+            color: var(--secondary);
+            border-color: var(--secondary);
         }
     </style>
 </head>

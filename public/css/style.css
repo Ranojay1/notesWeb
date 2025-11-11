@@ -30,6 +30,19 @@
     --transition: all 0.3s ease;
 }
 
+:root.dark-mode {
+    --primary-color: #3b82f6;
+    --primary-dark: #1e3a8a;
+    --secondary-color: #fbbf24;
+    --background-color: #0f172a;
+    --surface-color: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --border-color: #334155;
+    --shadow: 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-hover: 0 4px 8px rgba(0,0,0,0.4);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -116,6 +129,125 @@ body {
 
 .header-search input::placeholder {
     color: var(--text-secondary);
+}
+
+/* Search Dropdown */
+.header-search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1999;
+    min-width: 250px;
+}
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-group {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.search-group:last-child {
+    border-bottom: none;
+}
+
+.search-group-title {
+    padding: 12px 16px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.search-item {
+    padding: 10px 16px;
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-item:hover {
+    background: rgba(33, 150, 243, 0.08);
+}
+
+.search-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--secondary-color);
+    flex-shrink: 0;
+}
+
+.search-note-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.search-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-item-text {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.search-item-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.search-all {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-align: center;
+    padding: 12px 16px;
+}
+
+.search-loading,
+.search-empty {
+    padding: 20px 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 /* Profile Dropdown */
@@ -492,15 +624,15 @@ textarea.form-control {
 
 /* Comentarios dentro de una nota */
 .note-card .comments-section {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    background: rgba(255,255,255,0.02);
     margin-top: 18px;
     padding: 16px;
     border-radius: 6px;
-    border: 1px solid rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
 }
 
 .note-card .comment-card {
-    background: #fafafa;
+    background: var(--surface-color);
     border: 1px solid var(--border-color);
     padding: 12px 14px;
     border-radius: 8px;
@@ -526,7 +658,7 @@ textarea.form-control {
     padding: 12px 14px;
     margin-bottom: 12px;
     border: 1px solid var(--border-color);
-    background: linear-gradient(180deg, #ffffff, #fbfbfb);
+    background: linear-gradient(180deg, var(--surface-color), var(--background-color));
     border-radius: 8px;
     font-size: 15px;
     line-height: 1.5;
@@ -917,7 +1049,7 @@ a[href="/register.php"]:hover {
 }
 
 .create-note-card {
-    background: linear-gradient(180deg, var(--surface-color), #fbfcff);
+    background: linear-gradient(180deg, var(--surface-color), var(--background-color));
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 22px;
@@ -977,7 +1109,7 @@ a[href="/register.php"]:hover {
 .login-card {
     width: 100%;
     max-width: 420px;
-    background: linear-gradient(180deg, var(--surface-color), rgba(245,245,245,0.98));
+    background: linear-gradient(180deg, var(--surface-color), var(--background-color));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 22px;
@@ -1171,4 +1303,463 @@ a[href="/register.php"]:hover {
 .btn-cancel:hover {
     opacity: 0.8;
 }
+
+/* ========== DARK MODE STYLES ========== */
+:root.dark-mode .note-follower {
+    background: linear-gradient(90deg, #1a2a3a 0%, #0f1f2f 100%);
+    border-color: #ff9800;
+}
+
+:root.dark-mode .privacy-follower {
+    background-color: #ff9800;
+    color: #0f172a;
+}
+
+:root.dark-mode button,
+:root.dark-mode input[type="button"],
+:root.dark-mode input[type="submit"] {
+    background-color: var(--primary-color);
+    color: #0f172a;
+}
+
+:root.dark-mode button:hover,
+:root.dark-mode input[type="button"]:hover,
+:root.dark-mode input[type="submit"]:hover {
+    background-color: var(--primary-dark);
+}
+
+:root.dark-mode input,
+:root.dark-mode textarea,
+:root.dark-mode select {
+    background-color: #1e293b;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode input::placeholder,
+:root.dark-mode textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+:root.dark-mode .container {
+    background-color: var(--background-color);
+}
+
+:root.dark-mode .main-content {
+    background-color: var(--background-color);
+}
+
+:root.dark-mode .card,
+:root.dark-mode .form-container,
+:root.dark-mode .note-item,
+:root.dark-mode .user-item,
+:root.dark-mode .comment-box,
+:root.dark-mode .request-item {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode a {
+    color: var(--primary-color);
+}
+
+:root.dark-mode a:hover {
+    color: var(--primary-dark);
+}
+
+:root.dark-mode .btn-primary,
+:root.dark-mode .btn-secondary,
+:root.dark-mode .btn-danger {
+    color: #0f172a;
+}
+
+:root.dark-mode .btn-primary {
+    background-color: var(--secondary-color);
+}
+
+:root.dark-mode .btn-secondary {
+    background-color: var(--primary-color);
+}
+
+:root.dark-mode .btn-danger {
+    background-color: #ef4444;
+}
+
+:root.dark-mode .login-container,
+:root.dark-mode .register-container {
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .form-group label {
+    color: var(--text-primary);
+}
+
+:root.dark-mode .profile-dropdown-menu button:last-child {
+    background-color: transparent;
+    color: #ef4444;
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .profile-dropdown-menu button:last-child:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+}
+
+:root.dark-mode .note-container,
+:root.dark-mode .comment-container {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .note-header,
+:root.dark-mode .comment-header {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .note-content,
+:root.dark-mode .comment-content {
+    color: var(--text-secondary);
+}
+
+:root.dark-mode .modal,
+:root.dark-mode .modal-content {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+:root.dark-mode table {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+:root.dark-mode table thead {
+    background-color: #0f172a;
+    color: var(--text-primary);
+}
+
+:root.dark-mode table tbody tr {
+    border-color: var(--border-color);
+}
+
+:root.dark-mode table tbody tr:hover {
+    background-color: #1e293b;
+}
+
+:root.dark-mode .pagination {
+    background-color: var(--surface-color);
+}
+
+:root.dark-mode .pagination a,
+:root.dark-mode .pagination button {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .pagination a:hover,
+:root.dark-mode .pagination button:hover {
+    background-color: var(--primary-color);
+    color: #0f172a;
+}
+
+:root.dark-mode .search-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+:root.dark-mode .search-note-icon {
+    background: rgba(139, 92, 246, 0.25);
+}
+
+:root.dark-mode .dropdown,
+:root.dark-mode .select {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode hr {
+    border-color: var(--border-color);
+}
+
+:root.dark-mode code,
+:root.dark-mode pre {
+    background-color: #0f172a;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .badge {
+    background-color: var(--primary-color);
+    color: #0f172a;
+}
+
+:root.dark-mode .alert {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* ========== DARK MODE FIXES FOR HARDCODED COLORS ========== */
+
+/* Textareas con degradados */
+:root.dark-mode textarea {
+    background: linear-gradient(180deg, #1e293b, #0f172a) !important;
+    color: var(--text-primary);
+}
+
+:root.dark-mode .note-card .add-comment textarea {
+    background: linear-gradient(180deg, #1e293b, #0f172a) !important;
+    color: var(--text-primary);
+}
+
+:root.dark-mode textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Login Card */
+:root.dark-mode .login-card {
+    background: linear-gradient(180deg, #1e293b, #0f172a) !important;
+    border-color: var(--border-color);
+}
+
+/* Register Container */
+:root.dark-mode .register-container {
+    background: linear-gradient(180deg, #1e293b, #0f172a) !important;
+    border-color: var(--border-color);
+}
+
+/* Create Note Card */
+:root.dark-mode .create-note-card {
+    background: linear-gradient(180deg, #1e293b, #0f172a) !important;
+    border-color: var(--border-color);
+}
+
+/* Form inputs */
+:root.dark-mode .form-control {
+    background: #1e293b !important;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+:root.dark-mode .form-control:focus {
+    background: #2a3f5f !important;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Note container backgrounds */
+:root.dark-mode .note-content {
+    background: transparent;
+}
+
+:root.dark-mode .note-header {
+    background: transparent;
+    border-bottom-color: var(--border-color);
+}
+
+/* Dropdowns y selects */
+:root.dark-mode select {
+    background: #1e293b !important;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* Buttons con white text específico */
+:root.dark-mode .btn-primary,
+:root.dark-mode .btn-secondary,
+:root.dark-mode .btn-success,
+:root.dark-mode .btn-danger,
+:root.dark-mode .btn-warning,
+:root.dark-mode .btn-info {
+    color: #0f172a !important;
+}
+
+/* Elementos específicos con background blanco */
+:root.dark-mode [style*="background: white"],
+:root.dark-mode [style*="background-color: white"],
+:root.dark-mode [style*="background: #fff"],
+:root.dark-mode [style*="background: #ffffff"] {
+    background: var(--surface-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Elementos con color negro */
+:root.dark-mode [style*="color: white"],
+:root.dark-mode [style*="color: #fff"],
+:root.dark-mode [style*="color: #ffffff"] {
+    color: var(--text-primary) !important;
+}
+
+/* Comment boxes y similares */
+:root.dark-mode .comment-box,
+:root.dark-mode .comment-section,
+:root.dark-mode .comments-container {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* Elementos de lista */
+:root.dark-mode li,
+:root.dark-mode .list-item,
+:root.dark-mode .item {
+    color: var(--text-primary);
+    background: transparent;
+}
+
+/* Seccion de amigos y followers */
+:root.dark-mode .friend-item,
+:root.dark-mode .follower-item,
+:root.dark-mode .user-item {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* Secciones de texto */
+:root.dark-mode p,
+:root.dark-mode span,
+:root.dark-mode div {
+    color: inherit;
+}
+
+/* Elementos con fondo específico */
+:root.dark-mode .content,
+:root.dark-mode .section,
+:root.dark-mode .wrapper {
+    background: transparent;
+    color: var(--text-primary);
+}
+
+/* Inputs con outline */
+:root.dark-mode input:focus,
+:root.dark-mode textarea:focus,
+:root.dark-mode select:focus {
+    outline: none;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Comments section dark mode */
+:root.dark-mode .note-card .comments-section {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--border-color);
+}
+
+:root.dark-mode .note-card .comment-card {
+    background: #0f172a;
+    border-color: var(--border-color);
+}
+
+/* Colores de texto hardcodeados */
+:root.dark-mode [style*="color: #1e293b"],
+:root.dark-mode [style*="color: #212121"],
+:root.dark-mode [style*="color: #475569"],
+:root.dark-mode [style*="color: #333"] {
+    color: var(--text-primary) !important;
+}
+
+/* Fondos blancos/claros hardcodeados */
+:root.dark-mode [style*="background: #ffffff"],
+:root.dark-mode [style*="background: #fff"],
+:root.dark-mode [style*="background: #f8fafc"],
+:root.dark-mode [style*="background: #fbfbfb"],
+:root.dark-mode [style*="background: white"] {
+    background: var(--surface-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Hover states */
+:root.dark-mode .note-item:hover {
+    background: #2a3f5f !important;
+}
+
+:root.dark-mode .friend-item:hover,
+:root.dark-mode .user-item:hover,
+:root.dark-mode .comment-item:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Card titles */
+:root.dark-mode .card-title,
+:root.dark-mode .note-title,
+:root.dark-mode .comment-title {
+    color: var(--text-primary) !important;
+}
+
+/* Borders claros */
+:root.dark-mode [style*="border-color: #e2e8f0"],
+:root.dark-mode [style*="border: 2px solid #e2e8f0"] {
+    border-color: var(--border-color) !important;
+}
+
+/* Sombras para dark mode */
+:root.dark-mode .note-item:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Privacy selector y filter section */
+:root.dark-mode .privacy-selector,
+:root.dark-mode .filter-section {
+    background: var(--surface-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+:root.dark-mode .privacy-label,
+:root.dark-mode .filter-label {
+    color: var(--text-primary) !important;
+}
+
+:root.dark-mode .privacy-btn,
+:root.dark-mode .filter-btn {
+    background: var(--background-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+:root.dark-mode .privacy-btn:hover,
+:root.dark-mode .filter-btn:hover {
+    border-color: var(--secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+:root.dark-mode .privacy-btn.active,
+:root.dark-mode .filter-btn.active {
+    background: linear-gradient(135deg, var(--secondary) 0%, #f59e0b 100%) !important;
+    color: #0f172a !important;
+    border-color: var(--secondary) !important;
+}
+
+/* Note cards públicas/amigos */
+:root.dark-mode .note-card {
+    background: var(--surface-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+:root.dark-mode .note-card:hover {
+    background: #2a3f5f !important;
+    border-color: var(--secondary) !important;
+}
+
+:root.dark-mode .note-title {
+    color: var(--text-primary) !important;
+}
+
+:root.dark-mode .note-meta,
+:root.dark-mode .notes-title {
+    color: var(--text-secondary) !important;
+}
+
 

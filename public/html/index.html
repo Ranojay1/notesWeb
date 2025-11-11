@@ -4,7 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Thinkverse — Comparte ideas, guarda pensamientos</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    // Prevenir dark mode en index
+    document.documentElement.classList.remove('dark-mode');
+    localStorage.removeItem('theme');
+  </script>
+  <link rel="stylesheet" href="/css/style.css?v=3">
   <style>
     :root {
       --primary: #2563eb;
@@ -16,6 +21,17 @@
       --white: #fff;
       --radius: 14px;
       --shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    :root.dark-mode {
+      --primary: #3b82f6;
+      --primary-dark: #1e3a8a;
+      --secondary: #fbbf24;
+      --text: #f1f5f9;
+      --text-light: #cbd5e1;
+      --bg: #0f172a;
+      --white: #1e293b;
+      --shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
 
     body {
@@ -124,6 +140,10 @@
       width: 100%;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    :root.dark-mode .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
     }
 
     .btn {
@@ -257,6 +277,34 @@
       line-height: 1.6;
     }
 
+    :root.dark-mode .cta {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
+    }
+
+    :root.dark-mode .cta h2 {
+      color: #f1f5f9;
+    }
+
+    :root.dark-mode .cta p {
+      color: #cbd5e1;
+    }
+
+    :root.dark-mode .btn-primary {
+      background: var(--secondary);
+      color: #0f172a;
+    }
+
+    :root.dark-mode .btn-outline {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    :root.dark-mode .btn-outline:hover {
+      background: var(--primary);
+      color: #0f172a;
+    }
+
     /* Footer */
     .site-footer {
       background: var(--primary-dark);
@@ -272,6 +320,11 @@
     }
     .site-footer a:hover {
       opacity: 0.8;
+    }
+
+    :root.dark-mode .site-footer {
+      background: #0f172a;
+      border-top-color: rgba(59, 130, 246, 0.2);
     }
 
     @media (max-width: 800px) {
@@ -366,8 +419,21 @@
     </div>
   </section>
 
+  <!-- Search Results Container - Panel Flotante -->
+  <div id="searchResultsSection" style="display: none; position: fixed; top: 60px; left: 50%; transform: translateX(-50%); max-width: 600px; width: 90%; max-height: 70vh; overflow-y: auto; background: var(--white); border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 1998; color: var(--text);">
+    <div style="padding: 16px; position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2 id="searchTitle" style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text);"></h2>
+        <button id="closeSearchBtn" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-light); padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+      <div id="searchResultsContainer" style="display: grid; gap: 12px;">
+        <!-- Los resultados se mostrarán aquí -->
+      </div>
+    </div>
+  </div>
+
   <!-- CTA -->
-  <section class="cta">
+  <section id="ctaSection" class="cta">
     <h2>Empieza a escribir hoy</h2>
     <p>Únete a Thinkverse y descubre una nueva forma de capturar y compartir ideas.</p>
     <a href="/register" class="btn btn-primary">Registrarse gratis</a>
@@ -382,7 +448,7 @@
   </footer>
 
   <script src="/js/api.js?v=5"></script>
-  <script src="/js/header.js?v=1"></script>
+  <script src="/js/header.js?v=4"></script>
   <script src="/js/index.js?v=5"></script>
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -392,11 +458,84 @@
       const apiInstance = await window.api.load();
       const headerManager = new HeaderManager(apiInstance);
 
-      // Personalizar búsqueda para index
-      headerManager.performSearch = (query) => {
-        // En el index, simplemente mostrar mensaje o redirigir
-        console.log('Búsqueda desde index:', query);
+      const searchResultsSection = document.getElementById('searchResultsSection');
+      const searchResultsContainer = document.getElementById('searchResultsContainer');
+      const searchTitle = document.getElementById('searchTitle');
+      const closeSearchBtn = document.getElementById('closeSearchBtn');
+      const ctaSection = document.getElementById('ctaSection');
+
+      // Personalizar búsqueda para index - mostrar resultados dinámicamente
+      headerManager.performSearch = async (query) => {
+        try {
+          const data = await apiInstance.searchMixed(query);
+          
+          if (!data || !data.results || data.results.length === 0) {
+            searchResultsContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-light);">😔 Sin resultados para "<strong>' + query + '</strong>"</div>';
+            searchTitle.textContent = `Búsqueda`;
+            searchResultsSection.style.display = 'block';
+            return;
+          }
+
+          const users = data.results.filter(r => r.type === 'user').slice(0, 6);
+          const notes = data.results.filter(r => r.type === 'note').slice(0, 8);
+
+          let html = '';
+
+          if (users.length > 0) {
+            html += '<div style="margin-bottom: 12px;"><h4 style="margin: 0 0 8px 0; color: var(--text); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">👥 Usuarios</h4>';
+            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-bottom: 0;">';
+            html += users.map(user => {
+              const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.username)}`;
+              const lightBg = 'linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%)';
+              const darkBg = 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)';
+              return `
+                <a href="/profile?user=${encodeURIComponent(user.username)}" style="text-decoration: none; cursor: pointer;">
+                  <div style="background: var(--white); border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; text-align: center; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 2px 8px rgba(37, 99, 235, 0.12)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    <img src="${avatarUrl}" alt="${user.username}" style="width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 6px; border: 2px solid var(--secondary); object-fit: cover;">
+                    <div style="font-weight: 600; color: var(--text); word-break: break-word; font-size: 11px; line-height: 1.2;">${user.username}</div>
+                  </div>
+                </a>
+              `;
+            }).join('');
+            html += '</div></div>';
+          }
+
+          if (notes.length > 0) {
+            html += '<div><h4 style="margin: 0 0 8px 0; color: var(--text); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">📝 Notas Públicas</h4>';
+            html += '<div style="display: grid; gap: 8px;">';
+            html += notes.map(note => `
+              <a href="/note?id=${note.id}" style="text-decoration: none; cursor: pointer;">
+                <div style="background: var(--white); border: 1px solid #e2e8f0; border-left: 3px solid var(--secondary); border-radius: 6px; padding: 8px; transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 2px 8px rgba(250, 204, 21, 0.12)';" onmouseout="this.style.boxShadow='none';">
+                  <div style="font-weight: 600; color: var(--text); margin-bottom: 2px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${note.title || '📄 Sin título'}</div>
+                  <div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-width: 100%;">${note.content?.substring(0, 80) || 'Sin contenido'}...</div>
+                  <div style="font-size: 10px; color: var(--text-light); display: flex; align-items: center; gap: 4px;">
+                    <span>👤</span>
+                    <span>${note.username}</span>
+                  </div>
+                </div>
+              </a>
+            `).join('');
+            html += '</div></div>';
+          }
+
+          searchResultsContainer.innerHTML = html;
+          searchTitle.textContent = `${data.results.length} resultados encontrados`;
+          searchResultsSection.style.display = 'block';
+        } catch (err) {
+          console.error('Search error:', err);
+          searchResultsContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #e74c3c;">❌ Error en la búsqueda: ' + err.message + '</div>';
+          searchResultsSection.style.display = 'block';
+        }
       };
+
+      headerManager.clearSearch = () => {
+        searchResultsSection.style.display = 'none';
+      };
+
+      // Cerrar búsqueda al hacer click en X
+      closeSearchBtn.addEventListener('click', () => {
+        headerManager.clearSearch();
+      });
 
       const navItems = [
         { href: '/myNotes', label: '📝 Mis notas' },

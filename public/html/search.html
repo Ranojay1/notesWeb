@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscar - Thinkverse</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/theme.js"></script>
+    <link rel="stylesheet" href="/css/style.css?v=3">
     <script src="/js/api.js?v=5"></script>
-    <script src="/js/header.js?v=1"></script>
+    <script src="/js/header.js?v=4"></script>
     <style>
         .search-container {
             max-width: 1000px;
@@ -45,29 +46,6 @@
             border-color: var(--secondary);
             background: #0f172a;
             box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
-        }
-
-        .btn-search {
-            padding: 14px 32px;
-            background: linear-gradient(135deg, var(--secondary) 0%, #eab308 100%);
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-search:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
-        }
-
-        .btn-search:active {
-            transform: translateY(0);
         }
 
         .filters {
@@ -119,24 +97,24 @@
             background: #f8fafc;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            padding: 18px;
+            padding: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
-            gap: 15px;
-            align-items: flex-start;
+            gap: 18px;
+            align-items: center;
         }
 
         .result-item:hover {
             background: #ffffff;
             border-color: var(--secondary);
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 193, 7, 0.25);
+            transform: translateY(-3px);
         }
 
         .result-avatar {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--secondary);
@@ -145,30 +123,32 @@
 
         .result-content {
             flex: 1;
+            min-width: 0;
         }
 
         .result-title {
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 5px;
-            font-size: 16px;
+            margin-bottom: 6px;
+            font-size: 18px;
         }
 
         .result-meta {
-            font-size: 13px;
+            font-size: 14px;
             color: #64748b;
-            margin-bottom: 8px;
-            font-weight: 500;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .result-preview {
             font-size: 14px;
             color: #475569;
-            line-height: 1.5;
+            line-height: 1.6;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
         }
 
@@ -176,12 +156,13 @@
             display: inline-block;
             background: rgba(139, 92, 246, 0.15);
             color: #6d28d9;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 5px 12px;
+            border-radius: 8px;
             font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-weight: 700;
+            margin-bottom: 10px;
             border: 1px solid rgba(139, 92, 246, 0.3);
+            letter-spacing: 0.3px;
         }
 
         .empty-state {
@@ -257,9 +238,8 @@
                     type="text" 
                     class="search-input" 
                     id="searchInput" 
-                    placeholder="Buscar usuarios, notas..."
+                    placeholder="buscar..."
                     autocomplete="off">
-                <button class="btn-search" id="searchBtn">Buscar</button>
             </div>
         </div>
 
@@ -279,6 +259,6 @@
         </div>
     </div>
 
-    <script src="/js/search.js?v=2"></script>
+    <script src="/js/search.js?v=3"></script>
 </body>
 </html>

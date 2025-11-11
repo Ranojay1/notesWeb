@@ -6,19 +6,45 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    const searchInput = document.getElementById('searchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const errorContainer = document.getElementById('errorContainer');
+    let currentFilter = 'all';
+
+    // Obtener parámetro de búsqueda de la URL si existe
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('q');
+
     // Inicializar header
     const headerManager = new HeaderManager(apiInstance);
     const navItems = [
-        { href: '/profile', label: '� Mi perfil' },
+        { href: '/profile', label: '👤 Mi perfil' },
         { href: '/friends', label: '👥 Amigos' }
     ];
     await headerManager.initialize(navItems);
 
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const resultsContainer = document.getElementById('resultsContainer');
-    const errorContainer = document.getElementById('errorContainer');
-    let currentFilter = 'all';
+    // Hacer que el buscador del header sea dinámico
+    headerManager.performSearch = (query) => {
+        searchInput.value = query;
+        performSearch(query);
+    };
+
+    headerManager.clearSearch = () => {
+        searchInput.value = '';
+        resultsContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-text">Escribe para buscar</div>
+            </div>
+        `;
+        errorContainer.innerHTML = '';
+    };
+
+    // Si hay una búsqueda inicial, realizarla
+    if (initialQuery) {
+        searchInput.value = initialQuery;
+        performSearch(initialQuery);
+    }
 
     async function performSearch(query) {
         if (!query.trim()) {
@@ -87,8 +113,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                          src="https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username || user}" 
                          alt="${user.username || user}">
                     <div class="result-content">
-                        <div class="result-title">${user.username || user}</div>
-                        <div class="result-meta">Perfil de usuario</div>
+                        <div class="result-title">@${user.username || user}</div>
+                        <div class="result-meta">👤 Perfil de usuario</div>
                     </div>
                 </div>
             `).join('');
@@ -100,11 +126,11 @@ window.addEventListener('DOMContentLoaded', async () => {
             html += '<div class="results-grid">';
             html += filteredNotes.map(note => `
                 <div class="result-item" onclick="window.location.href='/note?id=${note.id}'">
-                    <div>
-                        <div class="note-badge">Nota pública</div>
+                    <div class="result-content">
+                        <div class="note-badge">📌 Nota pública</div>
                         <div class="result-title">${note.title || 'Sin título'}</div>
-                        <div class="result-meta">Por ${note.username || 'Anónimo'}</div>
-                        <div class="result-preview">${note.content?.substring(0, 100) || 'Sin contenido'}...</div>
+                        <div class="result-meta">✍️ Por @${note.username || 'Anónimo'}</div>
+                        <div class="result-preview">${note.content?.substring(0, 150) || 'Sin contenido'}${note.content?.length > 150 ? '...' : ''}</div>
                     </div>
                 </div>
             `).join('');
@@ -131,10 +157,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Event listeners
-    searchBtn.addEventListener('click', () => {
-        performSearch(searchInput.value);
-    });
-
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             performSearch(searchInput.value);
@@ -145,9 +167,21 @@ window.addEventListener('DOMContentLoaded', async () => {
     let searchTimeout;
     searchInput.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            performSearch(e.target.value);
-        }, 300);
+        const query = e.target.value.trim();
+        
+        if (query.length >= 2) {
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, 300);
+        } else if (query.length === 0) {
+            resultsContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <div class="empty-text">Escribe para buscar</div>
+                </div>
+            `;
+            errorContainer.innerHTML = '';
+        }
     });
 
     // Filter buttons

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Search - Thinkverse</title>
+    <link rel="stylesheet" href="/css/style.css?t=1">
+    <script src="/js/api.js?v=99"></script>
+    <script src="/js/header.js?v=99"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .debug-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            border-left: 4px solid #2196F3;
+        }
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="left">
+            <h1><a href="/" style="text-decoration: none; color: inherit;">Thinkverse Test</a></h1>
+        </div>
+        <div class="right"></div>
+    </div>
+
+    <div class="container">
+        <h1>🔍 Test de Búsqueda Dinámica</h1>
+        
+        <div class="instructions">
+            <strong>📋 Instrucciones:</strong>
+            <ol>
+                <li>Busca en el campo de búsqueda del header arriba (ej: "dada", "pedro")</li>
+                <li>Deberían aparecer resultados en un dropdown</li>
+                <li>Si no funciona, revisa el log de debug abajo</li>
+                <li>Abre la consola (F12) para más detalles</li>
+            </ol>
+        </div>
+        
+        <div class="debug-info" id="debugInfo">
+            Información de debug aparecer aquí...
+        </div>
+    </div>
+
+    <script>
+        // Capturar todos los logs
+        const logs = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            logs.push('LOG: ' + args.join(' '));
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            logs.push('ERROR: ' + args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const debugInfo = document.getElementById('debugInfo');
+            
+            try {
+                logs.push('⏱️ DOM cargado');
+                const apiInstance = await window.api.load();
+                logs.push('✅ API cargada');
+                logs.push('👤 Autenticado: ' + apiInstance.isAuthenticated());
+                
+                if (!apiInstance.isAuthenticated()) {
+                    logs.push('⚠️ No autenticado, redirigiendo a login...');
+                    updateDebug();
+                    setTimeout(() => window.location.href = '/login', 2000);
+                    return;
+                }
+
+                const headerManager = new HeaderManager(apiInstance);
+                logs.push('📋 HeaderManager creado');
+                
+                await headerManager.initialize([
+                    { href: '/profile', label: '👤 Mi perfil' }
+                ]);
+
+                logs.push('✅ Header inicializado correctamente');
+                logs.push('🔍 Busca en el input de arriba. Espera a escribir 2+ caracteres');
+                
+                // Monitorear el input
+                setTimeout(() => {
+                    const searchInput = document.getElementById('globalSearch');
+                    const searchDropdown = document.getElementById('searchDropdown');
+                    
+                    if (searchInput) {
+                        logs.push('✅ Input encontrado');
+                        searchInput.addEventListener('input', () => {
+                            logs.push(`📝 Input cambió: "${searchInput.value}"`);
+                            updateDebug();
+                        });
+                    } else {
+                        logs.push('❌ Input NO encontrado');
+                    }
+                    
+                    if (searchDropdown) {
+                        logs.push('✅ Dropdown encontrado');
+                    } else {
+                        logs.push('❌ Dropdown NO encontrado');
+                    }
+                    
+                    updateDebug();
+                }, 500);
+                
+            } catch (err) {
+                logs.push('❌ Error: ' + err.message);
+                if (err.stack) logs.push(err.stack);
+                updateDebug();
+            }
+        });
+
+        function updateDebug() {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.textContent = logs.slice(-20).join('\n'); // Mostrar últimos 20 logs
+        }
+
+        // Actualizar cada segundo
+        setInterval(updateDebug, 1000);
+    </script>
+</body>
+</html>

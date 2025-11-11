@@ -38,11 +38,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const avatar = document.getElementById('profileAvatar');
         // Obtener foto de perfil Discord si existe
         const profilePic = await apiInstance.getProfilePic(profile.username);
-        if (profilePic && profilePic.url) {
-            avatar.src = profilePic.url;
-        } else {
-            avatar.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + profile.username;
-        }
+        avatar.src = profilePic?.url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.username}`;
 
         if (profile.discord_username) {
             document.getElementById('profileDiscord').textContent = '@' + profile.discord_username;
@@ -102,14 +98,17 @@ window.addEventListener('DOMContentLoaded', async () => {
         const friendsList = document.getElementById('friendsList');
 
         if (data.friends && data.friends.length > 0) {
-            friendsList.innerHTML = data.friends.map(friend => `
-                <div class="friend-item" onclick="window.location.href='/profile?user=${friend.username || friend}'">
-                    <img class="friend-avatar" 
-                         src="https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.username || friend}" 
-                         alt="${friend.username || friend}">
-                    <div class="friend-name">${friend.username || friend}</div>
-                </div>
-            `).join('');
+            const friendsHtml = await Promise.all(data.friends.map(async friend => {
+                const username = friend.username || friend;
+                const picData = await apiInstance.getProfilePic(username);
+                const picUrl = picData?.url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+                return `
+                <div class="friend-item" onclick="window.location.href='/profile?user=${username}'">
+                    <img class="friend-avatar" src="${picUrl}" alt="${username}">
+                    <div class="friend-name">${username}</div>
+                </div>`;
+            }));
+            friendsList.innerHTML = friendsHtml.join('');
         } else {
             friendsList.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div>Sin amigos</div>';
         }

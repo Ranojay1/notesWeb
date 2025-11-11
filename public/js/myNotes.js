@@ -90,7 +90,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const sorted = sortNotes();
         const notesHTML = sorted.map(note => `
             <div class="note-item" onclick="window.location.href='/note?id=${note.id}'">
-                <h3>${note.title}</h3>
+                <h3 class="note-title">${note.title}</h3>
                 <p>${(note.content || '').substring(0, 150)}...</p>
                 <div class="note-meta">
                     <span>${new Date(note.created_at || note.date || Date.now()).toLocaleDateString('es-ES')}</span>
@@ -99,7 +99,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             </div>
         `).join('');
 
-        notesContainer.innerHTML = notesHTML;
+        notesContainer.innerHTML = `<div class="notes-grid">${notesHTML}</div>`;
     }
 
     async function loadMyPage() {

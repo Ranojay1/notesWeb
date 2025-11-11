@@ -586,6 +586,7 @@ class apiLoader {
         }
     }
 
+
     async getUserNotes(targetUser, limit = 20, offset = 0) {
         try {
             const response = await fetch(this.apiBase + '/getNotes', {
@@ -651,14 +652,15 @@ class apiLoader {
         }
     }
 
-    async getProfilePic(username) {
+    async getProfilePic(target) {
         try {
             const response = await fetch(this.apiBase + '/getProfilePic', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ target: username })
+                body: JSON.stringify({ target })
             });
             const data = await response.json();
+            if(!data) return { url: "https://api.dicebear.com/7.x/avataaars/svg?seed=" + target };
             return data;
         } catch (error) {
             console.error('Error fetching profile pic:', error);
