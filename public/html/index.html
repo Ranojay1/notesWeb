@@ -34,15 +34,55 @@
       align-items: center;
       background: var(--white);
       padding: 18px 40px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
       z-index: 1000;
+      border-bottom: 1px solid #e2e8f0;
     }
     .header h1 {
       font-size: 26px;
       color: var(--primary);
       font-weight: 800;
+      margin: 0;
+    }
+    .header .right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .header .right a {
+      color: var(--text-light);
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .header-search {
+      display: flex;
+      align-items: center;
+      background: var(--white);
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 8px 16px;
+      min-width: 250px;
+    }
+    .header-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: var(--text);
+      width: 100%;
+      font-family: inherit;
+    }
+    .header-search input::placeholder {
+      color: var(--text-light);
+    }
+    .header .right a:hover {
+      color: var(--primary);
+      background: rgba(37, 99, 235, 0.1);
     }
 
     /* Hero */
@@ -51,69 +91,112 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      padding: 80px 10% 60px;
+      padding: 100px 10% 80px;
       background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
       color: white;
+      gap: 50px;
     }
     .hero-text {
       flex: 1;
       min-width: 280px;
-      margin-right: 40px;
     }
     .hero-text h2 {
-      font-size: 48px;
-      margin-bottom: 20px;
-      line-height: 1.2;
+      font-size: 56px;
+      margin-bottom: 24px;
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -1px;
     }
     .hero-text p {
-      font-size: 18px;
-      margin-bottom: 30px;
+      font-size: 20px;
+      margin-bottom: 40px;
       color: #e2e8f0;
+      line-height: 1.6;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
     }
     .hero img {
+      flex: 1;
       max-width: 420px;
       width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
     }
 
     .btn {
-      padding: 12px 22px;
+      padding: 14px 28px;
       border-radius: var(--radius);
       font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: 0.25s;
+      transition: all 0.3s ease;
       font-size: 16px;
+      display: inline-block;
+      text-align: center;
     }
-    .btn-primary { background: var(--secondary); color: black; }
-    .btn-primary:hover { background: #eab308; }
-    .btn-outline { border: 2px solid white; color: white; background: transparent; }
-    .btn-outline:hover { background: white; color: var(--primary-dark); }
+    .btn-primary { 
+      background: var(--secondary); 
+      color: #000;
+      box-shadow: 0 4px 15px rgba(250, 204, 21, 0.3);
+    }
+    .btn-primary:hover { 
+      background: #eab308;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4);
+    }
+    .btn-outline { 
+      border: 2px solid var(--primary); 
+      color: var(--primary); 
+      background: transparent;
+    }
+    .btn-outline:hover { 
+      background: var(--primary); 
+      color: white;
+      transform: translateY(-2px);
+    }
 
     /* Features */
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 30px;
-      max-width: 1100px;
-      margin: 80px auto;
+      max-width: 1200px;
+      margin: 100px auto;
       padding: 0 20px;
     }
     .feature {
       background: var(--white);
       border-radius: var(--radius);
-      padding: 30px;
-      box-shadow: var(--shadow);
+      padding: 40px 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
       text-align: center;
-      transition: transform 0.25s;
+      transition: all 0.3s ease;
     }
-    .feature:hover { transform: translateY(-6px); }
+    .feature:hover { 
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      border-color: var(--secondary);
+    }
     .feature img {
       width: 80px;
-      margin-bottom: 20px;
+      height: 80px;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
     }
     .feature h3 {
       color: var(--primary);
       margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .feature p {
+      color: var(--text-light);
+      line-height: 1.6;
+      font-size: 15px;
     }
 
     /* Section with image */
@@ -122,53 +205,116 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      max-width: 1100px;
-      margin: 100px auto;
+      max-width: 1200px;
+      margin: 120px auto;
       padding: 0 20px;
-      gap: 40px;
+      gap: 60px;
     }
     .section img {
       flex: 1;
       max-width: 420px;
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
     }
     .section-text {
       flex: 1;
       min-width: 280px;
     }
     .section-text h2 {
-      font-size: 32px;
-      margin-bottom: 16px;
+      font-size: 40px;
+      margin-bottom: 24px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
     }
     .section-text p {
       font-size: 18px;
       color: var(--text-light);
+      line-height: 1.7;
+      margin-bottom: 0;
     }
 
     /* CTA */
     .cta {
       text-align: center;
-      padding: 80px 20px;
-      background: linear-gradient(135deg, #1e40af, #2563eb);
+      padding: 100px 20px;
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #1e40af 100%);
       color: white;
+      border-radius: 20px;
+      margin: 80px 20px;
+      box-shadow: 0 12px 40px rgba(30, 64, 175, 0.2);
     }
-    .cta h2 { font-size: 36px; margin-bottom: 20px; }
-    .cta p { font-size: 18px; margin-bottom: 30px; }
+    .cta h2 { 
+      font-size: 42px; 
+      margin-bottom: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .cta p { 
+      font-size: 18px; 
+      margin-bottom: 40px;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
 
     /* Footer */
     .site-footer {
       background: var(--primary-dark);
       color: white;
       text-align: center;
-      padding: 20px;
+      padding: 30px 20px;
       margin-top: 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
-    .site-footer a { color: #facc15; }
+    .site-footer a { 
+      color: var(--secondary);
+      transition: 0.3s ease;
+    }
+    .site-footer a:hover {
+      opacity: 0.8;
+    }
 
     @media (max-width: 800px) {
-      .hero { text-align: center; }
-      .hero-text { margin: 0 0 30px; }
+      .hero { 
+        text-align: center;
+        padding: 60px 20px 40px;
+      }
+      .hero-text { 
+        margin: 0 0 30px;
+      }
+      .hero-text h2 {
+        font-size: 36px;
+      }
+      .hero-text p {
+        font-size: 16px;
+      }
+      .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+      .hero-buttons .btn {
+        width: 100%;
+      }
+      .hero img {
+        max-width: 100%;
+      }
+      .section {
+        margin: 60px auto;
+        gap: 30px;
+      }
+      .section-text h2 {
+        font-size: 28px;
+      }
+      .cta {
+        margin: 40px 10px;
+        padding: 60px 20px;
+      }
+      .cta h2 {
+        font-size: 28px;
+      }
+      .features {
+        margin: 60px auto;
+      }
     }
   </style>
 </head>
@@ -186,13 +332,13 @@
     <div class="hero-text">
       <h2>Guarda pensamientos. <br> Comparte ideas.</h2>
       <p>Thinkverse es el espacio digital para capturar tus reflexiones, organizar tus notas y compartirlas con el mundo.</p>
-      <a href="/register" class="btn btn-primary">Comenzar ahora</a>
-      <a href="/public" class="btn btn-outline">Explorar notas</a>
+      <div class="hero-buttons">
+        <a href="/register" class="btn btn-primary">Comenzar ahora</a>
+        <a href="/public" class="btn btn-outline">Explorar notas</a>
+      </div>
     </div>
     <img src="https://api.thinkverse.site/images/index-1" alt="Ilustración de notas">
-  </section>
-
-  <!-- Features -->
+  </section>  <!-- Features -->
   <section class="features">
     <div class="feature">
       <img src="https://cdn-icons-png.flaticon.com/512/1827/1827504.png" alt="Minimalista">
@@ -236,9 +382,28 @@
   </footer>
 
   <script src="/js/api.js?v=5"></script>
+  <script src="/js/header.js?v=1"></script>
   <script src="/js/index.js?v=5"></script>
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Inicializar header dinámico
+    window.addEventListener('DOMContentLoaded', async () => {
+      const apiInstance = await window.api.load();
+      const headerManager = new HeaderManager(apiInstance);
+
+      // Personalizar búsqueda para index
+      headerManager.performSearch = (query) => {
+        // En el index, simplemente mostrar mensaje o redirigir
+        console.log('Búsqueda desde index:', query);
+      };
+
+      const navItems = [
+        { href: '/myNotes', label: '📝 Mis notas' },
+        { href: '/friendNotes', label: '👥 Notas de amigos' }
+      ];
+      await headerManager.initialize(navItems);
+    });
   </script>
 </body>
 </html>

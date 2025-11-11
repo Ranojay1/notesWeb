@@ -1,28 +1,22 @@
 window.addEventListener('DOMContentLoaded', async () => {
     const apiInstance = await window.api.load();
-    const rightDiv = document.querySelector('.right');
     const notes_site = document.querySelector('.content');
-    // Espera a que la sesión se cargue antes de mostrar el estado
-    (async () => {
-        if (typeof apiInstance.load === 'function') {
-            await apiInstance.load();
-        }
-        const auth = apiInstance.isAuthenticated();
-        if(!auth) return window.location.href = '/login';
-        rightDiv.innerHTML = `
-            <span>Bienvenido, ${apiInstance.user}</span>
-            <button id="logoutBtn">Logout</button>
-        `;
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            apiInstance.logout();
-        });
-        const wrapper = document.createElement('div');
-        wrapper.className = 'create-note-wrapper';
-        wrapper.innerHTML = `
-            <div class="create-note-card">
-                <div class="note-header">
-                    <h3 class="note-title">Crear nueva nota</h3>
-                </div>
+    
+    if(!apiInstance.isAuthenticated()) {
+        return window.location.href = '/login';
+    }
+
+    // Inicializar header
+    const headerManager = new HeaderManager(apiInstance);
+    await headerManager.initialize();
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'create-note-wrapper';
+    wrapper.innerHTML = `
+        <div class="create-note-card">
+            <div class="note-header">
+                <h3 class="note-title">Crear nueva nota</h3>
+            </div>
                 <div class="note-content">
                     <form id="createNoteForm">
                         <div class="form-group">
@@ -80,9 +74,4 @@ window.addEventListener('DOMContentLoaded', async () => {
     // foco en el título para una mejor UX
     const titleInput = document.getElementById('noteTitle');
     if (titleInput) titleInput.focus();
-
-
-
-
-    })();
 });

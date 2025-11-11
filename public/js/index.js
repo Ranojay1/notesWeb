@@ -8,16 +8,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             await apiInstance.load();
         }
         const auth = apiInstance.isAuthenticated();
-        if(auth) {
-            rightDiv.innerHTML = `
-                <span>Bienvenido, ${apiInstance.user}</span>
-                <a href="/createNote"><button class="btn btn-primary">Crear nota</button></a>
-                <button id="logoutBtn" class="btn-logout">Logout</button>
-            `;
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                apiInstance.logout();
-            });
-        } else {
+        if(!auth){
             rightDiv.innerHTML = `
                 <a href="/login"><button class="btn btn-primary">Iniciar sesión</button></a>
                 <a href="/register"><button class="btn btn-primary" style="background: #10b981; margin-left: 8px;">Registrarse</button></a>

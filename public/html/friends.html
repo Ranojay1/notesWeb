@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amigos - Thinkverse</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/api.js?v=5"></script>
+    <script src="/js/header.js?v=1"></script>
+    <style>
+        .friends-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 15px 0;
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 600;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .tab-badge {
+            position: absolute;
+            top: 10px;
+            right: -8px;
+            background: rgb(239, 68, 68);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .friend-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .friend-row:hover {
+            background: #f8fafc;
+            border-color: var(--secondary);
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+        }
+
+        .friend-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary);
+        }
+
+        .friend-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .friend-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .friend-status {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .btn-accept {
+            background: var(--secondary);
+            color: black;
+        }
+
+        .btn-accept:hover {
+            background: #eab308;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-reject {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .btn-reject:hover {
+            background: #fecaca;
+            border-color: #dc2626;
+        }
+
+        .btn-remove {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .btn-remove:hover {
+            background: #fecaca;
+            border-color: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #1e293b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 2px solid #fca5a5;
+            color: #7f1d1d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #1e293b;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .friend-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .friend-actions {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .btn-action {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="left">
+            <h1><a href="/" style="text-decoration: none; color: inherit;">Thinkverse</a></h1>
+        </div>
+        <div class="right"></div>
+    </div>
+
+    <div class="friends-container">
+        <div id="errorContainer"></div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="friends">
+                👥 Mis Amigos
+            </div>
+            <div class="tab" data-tab="requests">
+                📬 Solicitudes
+                <span class="tab-badge" id="requestsBadge" style="display: none;">0</span>
+            </div>
+            <div class="tab" data-tab="followers">
+                👁️ Seguidores
+            </div>
+        </div>
+
+        <!-- Tab: Mis Amigos -->
+        <div id="friendsTab" class="tab-content">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchFriends" placeholder="Buscar amigos...">
+            </div>
+            <div id="friendsList"></div>
+        </div>
+
+        <!-- Tab: Solicitudes de Amistad -->
+        <div id="requestsTab" class="tab-content" style="display: none;">
+            <div id="requestsList"></div>
+        </div>
+
+        <!-- Tab: Seguidores -->
+        <div id="followersTab" class="tab-content" style="display: none;">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchFollowers" placeholder="Buscar seguidores...">
+            </div>
+            <div id="followersList"></div>
+        </div>
+    </div>
+
+    <script src="/js/friends.js?v=2"></script>
+</body>
+</html>

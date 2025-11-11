@@ -1,33 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thinkverse - Escritos de amigos</title>
+    <title>Notas de Amigos - Thinkverse</title>
     <link rel="stylesheet" href="/css/style.css">
-    
+    <script src="/js/api.js?v=5"></script>
+    <script src="/js/header.js?v=1"></script>
+    <script src="/js/privacyManager.js?v=1"></script>
+    <style>
+        .friend-notes-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .notes-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notes-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            color: #475569;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--secondary);
+            color: #1e293b;
+        }
+
+        .filter-btn.active {
+            background: var(--secondary);
+            color: black;
+            border-color: var(--secondary);
+        }
+
+        .notes-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .note-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .note-card:hover {
+            background: #ffffff;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .note-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            flex: 1;
+        }
+
+        .note-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .note-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .author-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .note-content {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .note-footer {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #94a3b8;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            color: #1e293b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgb(239, 68, 68);
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-selector {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .privacy-label {
+            font-weight: 600;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .privacy-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .privacy-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #475569;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .privacy-btn:hover {
+            border-color: var(--secondary);
+            color: #1e293b;
+        }
+
+        .privacy-btn.active {
+            background: var(--secondary);
+            color: black;
+            border-color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .notes-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .note-card {
+                padding: 15px;
+            }
+
+            .note-title {
+                font-size: 16px;
+            }
+
+            .note-content {
+                -webkit-line-clamp: 2;
+            }
+
+            .privacy-selector {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-    <script src="/js/api.js?v=5"></script>
-    <script src="/js/friendNotes.js"></script>
     <div class="header">
-        <div class="center">
-            <h1>📝 Notes</h1>
+        <div class="left">
+            <h1><a href="/" style="text-decoration: none; color: inherit;">Thinkverse</a></h1>
         </div>
-        <div class="right">
+        <div class="right"></div>
+    </div>
 
+    <div class="friend-notes-container">
+        <div class="notes-header">
+            <div class="notes-title">📝 Notas de Amigos</div>
+        </div>
+
+        <div id="privacyContainer"></div>
+
+        <div class="filter-section">
+            <button class="filter-btn active" data-sort="recent">Recientes</button>
+            <button class="filter-btn" data-sort="oldest">Antiguas</button>
+            <button class="filter-btn" data-sort="popular">Populares</button>
+        </div>
+
+        <div id="errorContainer"></div>
+        <div id="notesContainer">
+            <div class="loading">Cargando notas de amigos...</div>
         </div>
     </div>
-    <div class="container">
-        <div class="main-content">
-            <div id="content" class="content">
-                <!-- Content will be loaded dynamically -->
-            </div>
-            
-            <aside id="sidebar" class="sidebar">
-                <!-- Sidebar will be loaded dynamically -->
-            </aside>
-        </div>
-    </div>
+
+    <script src="/js/friendNotes.js?v=3"></script>
 </body>
 </html>

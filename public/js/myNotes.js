@@ -1,93 +1,161 @@
 window.addEventListener('DOMContentLoaded', async () => {
     const apiInstance = await window.api.load();
-    const rightDiv = document.querySelector('.right');
-    const notes_site = document.querySelector('.content');
-    // Espera a que la sesión se cargue antes de mostrar el estado
-    (async () => {
-        if (typeof apiInstance.load === 'function') {
-            await apiInstance.load();
-        }
-        const auth = apiInstance.isAuthenticated();
-        document.getElementById('sidebar').innerHTML = `
-            <a href="/public"><button class="btn btn-outline">Notas púiblicas</button></a>
-            <a href="/friendNotes"><button class="btn btn-outline">Notas de amigos</button></a>
-            <a class="btn btn-selected">Mis notas</a>
-        `;
-        if(!auth) return window.location.href = '/login';
-        rightDiv.innerHTML = `
-            <span>Bienvenido, ${apiInstance.user}</span>
-            <a href="/createNote"><button class="btn btn-primary">Crear nota</button></a>
-            <button id="logoutBtn">Logout</button>
-        `;
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            apiInstance.logout();
+    
+    if(!apiInstance.isAuthenticated()) {
+        return window.location.href = '/login';
+    }
+
+    // Inicializar header
+    const headerManager = new HeaderManager(apiInstance);
+    
+    const notesContainer = document.getElementById('notesContainer');
+    const errorContainer = document.getElementById('errorContainer');
+    const privacyContainer = document.getElementById('privacyContainer');
+    
+    // Renderizar selector de privacidad
+    const privacyManager = new PrivacyManager('private');
+    privacyContainer.innerHTML = privacyManager.render();
+    
+    // Variable para almacenar todas las notas
+    let allNotes = [];
+    let currentSort = 'recent';
+
+    // Función de filtrado de notas
+    function filterNotes(query) {
+        const normalizedQuery = query.toLowerCase();
+        const noteCards = document.querySelectorAll('.note-item');
+        
+        noteCards.forEach(card => {
+            const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+            const content = card.querySelector('p')?.textContent.toLowerCase() || '';
+            
+            if (title.includes(normalizedQuery) || content.includes(normalizedQuery)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
         });
+    }
+    
+    // Personalizar búsqueda integrada
+    headerManager.performSearch = (query) => {
+        filterNotes(query);
+    };
 
-        // cargar mis notas (paginado)
-        let myOffset = 0;
-        const MY_LIMIT = 20;
+    const navItems = [
+        { href: '/friendNotes', label: '👥 Notas de amigos' },
+        { href: '/public', label: '📖 Notas públicas' }
+    ];
+    await headerManager.initialize(navItems);
 
-        async function loadMyPage() {
+    // Cargar mis notas (paginado)
+    let myOffset = 0;
+    const MY_LIMIT = 20;
+
+    function sortNotes() {
+        let sorted = [...allNotes];
+
+        switch (currentSort) {
+            case 'recent':
+                sorted.sort((a, b) => {
+                    const dateA = new Date(a.created_at || a.date || 0);
+                    const dateB = new Date(b.created_at || b.date || 0);
+                    return dateB - dateA;
+                });
+                break;
+            case 'oldest':
+                sorted.sort((a, b) => {
+                    const dateA = new Date(a.created_at || a.date || 0);
+                    const dateB = new Date(b.created_at || b.date || 0);
+                    return dateA - dateB;
+                });
+                break;
+        }
+
+        return sorted;
+    }
+
+    function renderNotes() {
+        if (!allNotes || allNotes.length === 0) {
+            notesContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <div class="empty-text">No hay notas aún</div>
+                    <p style="margin-top: 10px; color: #64748b;">Crea tu primera nota privada</p>
+                </div>
+            `;
+            return;
+        }
+
+        const sorted = sortNotes();
+        const notesHTML = sorted.map(note => `
+            <div class="note-item" onclick="window.location.href='/note?id=${note.id}'">
+                <h3>${note.title}</h3>
+                <p>${(note.content || '').substring(0, 150)}...</p>
+                <div class="note-meta">
+                    <span>${new Date(note.created_at || note.date || Date.now()).toLocaleDateString('es-ES')}</span>
+                    <span>${note.privacy === 'public' ? '🌍 Público' : note.privacy === 'friends' ? '👥 Amigos' : '🔒 Privado'}</span>
+                </div>
+            </div>
+        `).join('');
+
+        notesContainer.innerHTML = notesHTML;
+    }
+
+    async function loadMyPage() {
+        try {
             const rawNotes = await apiInstance.getMyNotes(MY_LIMIT, myOffset);
-            let publicNotes = [];
-            if (!rawNotes) publicNotes = [];
-            else if (Array.isArray(rawNotes)) publicNotes = rawNotes;
+            let notes = [];
+            if (!rawNotes) notes = [];
+            else if (Array.isArray(rawNotes)) notes = rawNotes;
             else if (typeof rawNotes === 'object') {
                 for (const key of Object.keys(rawNotes)) {
                     const group = rawNotes[key];
-                    if (Array.isArray(group)) publicNotes.push(...group);
+                    if (Array.isArray(group)) notes.push(...group);
                 }
             }
 
-            if(!publicNotes || publicNotes.length === 0) {
+            if(!notes || notes.length === 0) {
                 if (myOffset === 0) {
-                    const noNotesDiv = document.createElement('div');
-                    noNotesDiv.className = 'no-notes';
-                    noNotesDiv.innerHTML = `
-                        <p>No hay notas disponibles.</p>
-                    `;
-                    notes_site.appendChild(noNotesDiv);
+                    renderNotes();
                 }
                 return;
             }
-            for(const note of publicNotes) {
-            const noteDiv = document.createElement('div');
-            noteDiv.className = 'note-card';
-            noteDiv.innerHTML = `
-                <div class="note-header">
-                    <h3 class="note-title">${note.title}</h3>
-                    <span class="note-meta">
-                        <span class="note-author" style="color:#4f8cff;font-weight:600;">
-                            Tú
-                        </span>
-                        <span class="privacy-badge ${note.privacy === 'public' ? 'privacy-public' : note.privacy === 'private' ? 'privacy-private' : note.privacy === 'friends' ? 'privacy-friends' : 'privacy-follower'}">${note.privacy === 'public' ? 'Público' : note.privacy === 'private' ? 'Privado' : note.privacy === 'friends' ? 'Amigos' : 'Seguidores'}</span>
-                    </span>
-                </div>
-                <div class="note-content">${note.content.substring(0, 100)}...</div>
-                <div class="note-actions">
-                    <a href="/note?note=${note.id}" class="btn btn-outline">Leer más</a>
-                </div>
-            `;
-            notes_site.appendChild(noteDiv);
+            
+            // Almacenar notas para filtrado
+            allNotes.push(...notes);
+            
+            if (myOffset === 0) {
+                renderNotes();
             }
-            if (publicNotes.length === MY_LIMIT) {
-                let moreBtn = document.getElementById('my-more-btn');
-                if (!moreBtn) {
-                    moreBtn = document.createElement('button');
-                    moreBtn.id = 'my-more-btn';
-                    moreBtn.className = 'btn btn-outline';
-                    moreBtn.textContent = 'Ver más';
-                    moreBtn.addEventListener('click', async () => {
-                        // quitar el botón mientras cargamos la siguiente página
-                        moreBtn.remove();
-                        myOffset += MY_LIMIT;
-                        await loadMyPage();
-                    });
-                    notes_site.appendChild(moreBtn);
-                }
+            
+            if (notes.length === MY_LIMIT) {
+                const moreBtn = document.createElement('button');
+                moreBtn.className = 'btn btn-primary';
+                moreBtn.style.marginTop = '20px';
+                moreBtn.textContent = 'Ver más';
+                moreBtn.addEventListener('click', async () => {
+                    moreBtn.remove();
+                    myOffset += MY_LIMIT;
+                    await loadMyPage();
+                });
+                notesContainer.appendChild(moreBtn);
             }
+        } catch (err) {
+            console.error('Error loading notes:', err);
+            errorContainer.innerHTML = `<div class="error-message">⚠️ ${err.message}</div>`;
         }
+    }
 
-        await loadMyPage();
-    })();
+    await loadMyPage();
+
+    // Event listeners para filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSort = btn.getAttribute('data-sort');
+            renderNotes();
+        });
+    });
 });

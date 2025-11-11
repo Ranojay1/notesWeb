@@ -1,32 +1,351 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thinkverse - detalles</title>
+    <title>Nota - Thinkverse</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .note-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .note-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+        }
+
+        .note-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 20px 0;
+        }
+
+        .note-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .note-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .note-content {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            color: #1e293b;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 16px;
+        }
+
+        .comments-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .comments-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 30px;
+        }
+
+        .comment-form {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px 15px;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #1e293b;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .comment-textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .comment-textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            padding: 10px 20px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            color: black;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #eab308;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-submit:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #f8fafc;
+            border-color: #1e293b;
+        }
+
+        .comments-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .comment-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .comment-item:hover {
+            background: #ffffff;
+            border-color: var(--secondary);
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .comment-info {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+        }
+
+        .comment-author:hover {
+            color: var(--secondary);
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-left: 10px;
+        }
+
+        .comment-text {
+            color: #475569;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 12px;
+        }
+
+        .comment-actions-small {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .comment-action {
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .comment-action:hover {
+            color: var(--secondary);
+        }
+
+        .empty-comments {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 2px solid #fca5a5;
+            color: #7f1d1d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            border: 2px solid #86efac;
+            color: #166534;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .note-title {
+                font-size: 24px;
+            }
+
+            .note-content {
+                padding: 20px;
+            }
+
+            .comment-form {
+                padding: 15px;
+            }
+
+            .comment-textarea {
+                min-height: 80px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <script src="/js/api.js?v=5"></script>
-    <script src="/js/note.js"></script>
-
     <div class="header">
         <div class="left">
-            <button onclick="window.history.back()" class="btn btn-outline">← Volver</button>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">Thinkverse</a></h1>
         </div>
-        <div class="center">
-            <h1>📝 Notes</h1>
-        </div>
-        <div class="right">
-
-        </div>
+        <div class="right"></div>
     </div>
-    <div class="container">
-        <div class="main-content">
-            <div id="content" class="content">
-                <!-- Content will be loaded dynamically -->
+
+    <div class="note-container">
+        <div id="errorContainer"></div>
+        <div id="successContainer"></div>
+
+        <div id="noteContent" style="display: none;">
+            <div class="note-header">
+                <h1 class="note-title" id="noteTitle"></h1>
+                <div class="note-meta">
+                    <span class="note-author">
+                        <img class="author-avatar" id="authorAvatar" alt="Autor">
+                        <span id="authorName"></span>
+                    </span>
+                    <span id="noteDatetime"></span>
+                    <span id="notePrivacy"></span>
+                </div>
+            </div>
+
+            <div class="note-content" id="noteContentBody"></div>
+
+            <div class="comments-section">
+                <div class="comments-title">💬 Comentarios (<span id="commentCount">0</span>)</div>
+
+                <!-- Formulario de comentario -->
+                <div id="commentFormContainer" style="display: none;">
+                    <div class="comment-form">
+                        <textarea 
+                            class="comment-textarea" 
+                            id="commentTextarea" 
+                            placeholder="Escribe tu comentario..."></textarea>
+                        <div class="comment-actions">
+                            <button class="btn-cancel" id="cancelCommentBtn">Cancelar</button>
+                            <button class="btn-submit" id="submitCommentBtn">Enviar comentario</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón para mostrar formulario -->
+                <button id="openCommentFormBtn" class="btn-submit" style="margin-bottom: 30px; width: 100%;">
+                    Agregar comentario
+                </button>
+
+                <!-- Lista de comentarios -->
+                <div class="comments-list" id="commentsList"></div>
             </div>
         </div>
+
+        <div id="loadingContainer" class="loading">
+            Cargando nota...
+        </div>
     </div>
+
+    <script src="/js/note.js?v=3"></script>
 </body>
 </html>

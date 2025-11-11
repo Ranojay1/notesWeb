@@ -406,5 +406,264 @@ class apiLoader {
         else this.logout();
         return loginStatus;
     }
+
+    // ========== MÉTODOS PARA AMIGOS ==========
+    async getFriendsFromAPI() {
+        if(!this.isAuthenticated()) return { success: false, friends: [] };
+        try {
+            const response = await fetch(this.apiBase + '/getFriends', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.getAuthPayload())
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+            return { success: false, friends: [] };
+        }
+    }
+
+    async getFollowers() {
+        if(!this.isAuthenticated()) return { success: false, followers: [] };
+        try {
+            const response = await fetch(this.apiBase + '/getFollowers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.getAuthPayload())
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching followers:', error);
+            return { success: false, followers: [] };
+        }
+    }
+
+    async getFriendRequests() {
+        if(!this.isAuthenticated()) return { success: false, requests: [] };
+        try {
+            const response = await fetch(this.apiBase + '/hasFriendRequests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.getAuthPayload())
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching friend requests:', error);
+            return { success: false, requests: [] };
+        }
+    }
+
+    async addFriendToAPI(targetUser) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/addFriend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), friend: targetUser })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error adding friend:', error);
+            return { success: false };
+        }
+    }
+
+    async deleteFriendFromAPI(targetUser) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/deleteFriend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), friend: targetUser })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error deleting friend:', error);
+            return { success: false };
+        }
+    }
+
+    async rejectFriendRequestFromAPI(targetUser) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/rejectFriendRequest', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), sender: targetUser })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error rejecting friend request:', error);
+            return { success: false };
+        }
+    }
+
+    // ========== MÉTODOS PARA PERFIL ==========
+    async getUserProfile(targetUser) {
+        try {
+            const payload = this.isAuthenticated() ? this.getAuthPayload() : {};
+            const response = await fetch(this.apiBase + '/getUserProfile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, username: targetUser })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+            return null;
+        }
+    }
+
+    async getFollowStats(targetUser) {
+        try {
+            const payload = this.isAuthenticated() ? this.getAuthPayload() : {};
+            const response = await fetch(this.apiBase + '/getFollowStats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, username: targetUser })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching follow stats:', error);
+            return null;
+        }
+    }
+
+    // ========== MÉTODOS PARA BÚSQUEDA ==========
+    async searchMixed(query) {
+        try {
+            const response = await fetch(this.apiBase + '/searchMixed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error searching:', error);
+            return { results: [], users: [], notes: [] };
+        }
+    }
+
+    // ========== MÉTODOS PARA NOTAS ==========
+    async getFriendNotesFromAPI(limit = 20, offset = 0) {
+        if(!this.isAuthenticated()) return [];
+        try {
+            const response = await fetch(this.apiBase + '/getFriendNotes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), limit, offset })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching friend notes:', error);
+            return [];
+        }
+    }
+
+    async getNoteWithDetails(noteId) {
+        try {
+            const payload = this.isAuthenticated() ? this.getAuthPayload() : {};
+            const response = await fetch(this.apiBase + '/getNote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, id: noteId })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching note:', error);
+            return null;
+        }
+    }
+
+    async getUserNotes(targetUser, limit = 20, offset = 0) {
+        try {
+            const response = await fetch(this.apiBase + '/getNotes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: targetUser, limit, offset })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching user notes:', error);
+            return [];
+        }
+    }
+
+    // ========== MÉTODOS PARA COMENTARIOS ==========
+    async getCommentsForNote(noteId, limit = 20, offset = 0) {
+        try {
+            const payload = this.isAuthenticated() ? this.getAuthPayload() : {};
+            const response = await fetch(this.apiBase + '/getPublicComments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, id: noteId, limit, offset })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            return [];
+        }
+    }
+
+    async addCommentToNote(noteId, commentText) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/sendComment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), id: noteId, comment: commentText })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            return { success: false };
+        }
+    }
+
+    // ========== MÉTODOS DISCORD ==========
+    async linkDiscordAccount(discordId) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/linkDiscord', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), discordId })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error linking Discord:', error);
+            return { success: false };
+        }
+    }
+
+    async getProfilePic(username) {
+        try {
+            const response = await fetch(this.apiBase + '/getProfilePic', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target: username })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching profile pic:', error);
+            return null;
+        }
+    }
 }
 window.api = new apiLoader();
