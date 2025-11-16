@@ -436,7 +436,10 @@
   <section id="ctaSection" class="cta">
     <h2>Empieza a escribir hoy</h2>
     <p>Únete a Thinkverse y descubre una nueva forma de capturar y compartir ideas.</p>
-    <a href="/register" class="btn btn-primary">Registrarse gratis</a>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href="/register" class="btn btn-primary">Registrarse gratis</a>
+      <a href="/createNote" class="btn btn-outline" style="border-color: white; color: white;">✍️ Crear nota</a>
+    </div>
   </section>
 
   <!-- Footer -->
@@ -538,6 +541,8 @@
       });
 
       const navItems = [
+        { href: '/createNote', label: '✍️ Crear nota', isPrimary: true },
+        { href: '/dashboard', label: '📊 General' },
         { href: '/myNotes', label: '📝 Mis notas' },
         { href: '/friendNotes', label: '👥 Notas de amigos' }
       ];

@@ -1,33 +1,382 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thinkverse - detalles</title>
+    <title>Crear Nota - Thinkverse</title>
     <script src="/js/theme.js"></script>
     <link rel="stylesheet" href="/css/style.css?v=3">
-    <script src="/js/api.js?v=5"></script>
-    <script src="/js/header.js?v=4"></script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+        }
+
+        :root.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .create-note-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .create-note-wrapper {
+            width: 100%;
+        }
+
+        .create-note-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .note-header {
+            margin-bottom: 30px;
+        }
+
+        .note-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .note-content {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 250px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .create-note-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #eab308;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-secondary);
+            border-color: var(--secondary);
+        }
+
+        .privacy-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .create-note-container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+
+            .create-note-card {
+                padding: 20px;
+            }
+
+            .note-content {
+                padding: 20px;
+            }
+
+            .note-title {
+                font-size: 24px;
+            }
+
+            .create-note-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            textarea.form-control {
+                min-height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="header">
         <div class="left">
-            <button onclick="window.history.back()" class="btn btn-outline">← Volver</button>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">Thinkverse</a></h1>
         </div>
-        <div class="center">
-            <h1>📝 Notes</h1>
-        </div>
-        <div class="right">
-
-        </div>
+        <div class="right"></div>
     </div>
-    <div class="container">
-        <div class="main-content">
-            <div id="content" class="content">
-                <!-- Content will be loaded dynamically -->
+
+    <div class="create-note-container">
+        <div id="errorContainer"></div>
+        <div id="successContainer"></div>
+        
+        <div class="create-note-wrapper">
+            <div class="create-note-card">
+                <div class="note-header">
+                    <h1 class="note-title">✍️ Crear Nueva Nota</h1>
+                </div>
+                <div class="note-content">
+                    <form id="createNoteForm">
+                        <div class="form-group">
+                            <label for="noteTitle">📌 Título</label>
+                            <input 
+                                type="text" 
+                                id="noteTitle" 
+                                name="title" 
+                                class="form-control" 
+                                placeholder="Dame un título a tu nota..."
+                                required 
+                                maxlength="100"
+                            >
+                            <div class="char-count"><span id="titleCount">0</span>/100</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="noteContent">📝 Contenido</label>
+                            <textarea 
+                                id="noteContent" 
+                                name="content" 
+                                class="form-control" 
+                                placeholder="Escribe tu contenido aquí..."
+                                required 
+                                maxlength="5000"
+                            ></textarea>
+                            <div class="char-count"><span id="contentCount">0</span>/5000</div>
+                            <div class="hint">Máximo 5000 caracteres</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notePrivacy">🔒 Privacidad</label>
+                            <select id="notePrivacy" name="privacy" class="form-control" required>
+                                <option value="public">🌐 Pública - Visible para todos</option>
+                                <option value="followers">👥 Seguidores - Visible solo para mis seguidores</option>
+                                <option value="friends">👫 Solo amigos - Visible solo para mis amigos</option>
+                                <option value="private">🔒 Privada - Solo para mí</option>
+                            </select>
+                            <div class="privacy-description" id="privacyDesc">Visible para todos los usuarios</div>
+                        </div>
+
+                        <div class="create-note-actions">
+                            <button type="button" class="btn btn-outline" onclick="window.history.back()">← Cancelar</button>
+                            <button type="submit" class="btn btn-primary">✓ Crear Nota</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    <script src="/js/createNote.js?v=1"></script>
+
+    <script src="/js/api.js?v=5"></script>
+    <script src="/js/header.js?v=4"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            const apiInstance = await window.api.load();
+            
+            if (!apiInstance.isAuthenticated()) {
+                return window.location.href = '/login';
+            }
+
+            // Inicializar header
+            const headerManager = new HeaderManager(apiInstance);
+            await headerManager.initialize();
+
+            // Contadores de caracteres
+            document.getElementById('noteTitle').addEventListener('input', (e) => {
+                document.getElementById('titleCount').textContent = e.target.value.length;
+            });
+
+            document.getElementById('noteContent').addEventListener('input', (e) => {
+                document.getElementById('contentCount').textContent = e.target.value.length;
+            });
+
+            // Cambiar descripción de privacidad
+            document.getElementById('notePrivacy').addEventListener('change', (e) => {
+                const descriptions = {
+                    'public': '🌐 Visible para todos los usuarios',
+                    'followers': '👥 Visible solo para tus seguidores',
+                    'friends': '👫 Visible solo para tus amigos',
+                    'private': '🔒 Solo tú puedes ver esta nota'
+                };
+                document.getElementById('privacyDesc').textContent = descriptions[e.target.value];
+            });
+
+            // Manejo del formulario
+            document.getElementById('createNoteForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const titleInput = document.getElementById('noteTitle');
+                const contentInput = document.getElementById('noteContent');
+                const privacySelect = document.getElementById('notePrivacy');
+                
+                const title = titleInput.value.trim();
+                const content = contentInput.value.trim();
+                const privacy = privacySelect.value;
+
+                if (!title || !content || !privacy) {
+                    showError('Por favor, completa todos los campos.');
+                    return;
+                }
+
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.textContent = '⏳ Creando...';
+
+                try {
+                    const newNote = await apiInstance.createNote({ title, content, privacy });
+                    
+                    if (newNote && (newNote.id || newNote.note_id)) {
+                        const id = newNote.id || newNote.note_id;
+                        showSuccess('¡Nota creada exitosamente!');
+                        setTimeout(() => {
+                            window.location.href = `/note?note=${id}`;
+                        }, 1500);
+                        return;
+                    }
+
+                    if (newNote && (newNote.success === true || newNote.message === 'Created')) {
+                        showSuccess('¡Nota creada exitosamente!');
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1500);
+                        return;
+                    }
+
+                    showError('Error al crear la nota. Inténtalo de nuevo.');
+                } catch (error) {
+                    console.error('Error creating note:', error);
+                    showError('Error al crear la nota. Inténtalo de nuevo.');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '✓ Crear Nota';
+                }
+            });
+
+            function showError(msg) {
+                const container = document.getElementById('errorContainer');
+                container.innerHTML = `<div style="background: #fee2e2; border: 2px solid #fca5a5; color: #7f1d1d; padding: 15px; border-radius: 8px; margin-bottom: 20px;">${msg}</div>`;
+            }
+
+            function showSuccess(msg) {
+                const container = document.getElementById('successContainer');
+                container.innerHTML = `<div style="background: #dcfce7; border: 2px solid #86efac; color: #166534; padding: 15px; border-radius: 8px; margin-bottom: 20px;">${msg}</div>`;
+            }
+
+            // Foco en el título
+            document.getElementById('noteTitle').focus();
+        });
+    </script>
 </body>
 </html>
+

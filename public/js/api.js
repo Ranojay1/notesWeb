@@ -240,6 +240,38 @@ class apiLoader {
         }
     }
 
+    async followUser(targetUser) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/follow', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), target: targetUser })
+            });
+            const data = await response.text();
+            return { success: data === 'success' };
+        } catch (error) {
+            console.error('Error following user:', error);
+            return { success: false };
+        }
+    }
+
+    async unfollowUser(targetUser) {
+        if(!this.isAuthenticated()) return { success: false };
+        try {
+            const response = await fetch(this.apiBase + '/deleteFollow', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.getAuthPayload(), target: targetUser })
+            });
+            const data = await response.text();
+            return { success: data === 'success' };
+        } catch (error) {
+            console.error('Error unfollowing user:', error);
+            return { success: false };
+        }
+    }
+
     async getMyNotes(limit = 20, offset = 0){
         if(!this.isAuthenticated()) return [];
         try {
@@ -472,6 +504,11 @@ class apiLoader {
         }
     }
 
+    async acceptFriendRequest(targetUser) {
+        // Aceptar es lo mismo que agregar (si hay una solicitud pendiente del otro lado, se acepta automáticamente)
+        return this.addFriendToAPI(targetUser);
+    }
+
     async deleteFriendFromAPI(targetUser) {
         if(!this.isAuthenticated()) return { success: false };
         try {
@@ -606,12 +643,27 @@ class apiLoader {
     async getCommentsForNote(noteId, limit = 20, offset = 0) {
         try {
             const payload = this.isAuthenticated() ? this.getAuthPayload() : {};
-            const response = await fetch(this.apiBase + '/getPublicComments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...payload, id: noteId, limit, offset })
-            });
+            
+            // Intentar obtener comentarios públicos primero
+            let response = await this.privateGetPublicComments(noteId, limit, offset);
+            
+            // Si falla, intentar comentarios privados
+            if (!response) {
+                response = await fetch(this.apiBase + '/getPrivateComments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...payload, id: noteId, limit, offset })
+                });
+            }
+            
+            // Si sigue sin respuesta válida, retornar array vacío
+            if (!response || !response.ok) {
+                console.error('No response or response not ok');
+                return [];
+            }
+            
             const data = await response.json();
+            console.log(data)
             return data;
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -619,16 +671,39 @@ class apiLoader {
         }
     }
 
+    async privateGetPublicComments(noteId, limit = 20, offset = 0) {
+        try {
+            const payload = this.isAuthenticated() ? this.getAuthPayload() : {};
+            const response = await fetch(this.apiBase + '/getPublicComments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, id: noteId, limit, offset })
+            });
+            if (!response.ok) {
+                console.error(`HTTP ${response.status} en getPublicComments`);
+                return null;
+            }
+            return response;
+        } catch (e) {
+            console.error('Error en privateGetPublicComments:', e);
+            return null;
+        }
+    }
+    
+
     async addCommentToNote(noteId, commentText) {
         if(!this.isAuthenticated()) return { success: false };
         try {
             const response = await fetch(this.apiBase + '/sendComment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...this.getAuthPayload(), id: noteId, comment: commentText })
+                body: JSON.stringify({ ...this.getAuthPayload(), id: noteId, content: commentText })
             });
-            const data = await response.json();
-            return data;
+            if (!response.ok) {
+                console.error(`HTTP ${response.status}: ${response.statusText}`);
+                return { success: false };
+            }
+            return { success: true };
         } catch (error) {
             console.error('Error adding comment:', error);
             return { success: false };

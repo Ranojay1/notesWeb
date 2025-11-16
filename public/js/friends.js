@@ -8,57 +8,45 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Inicializar header
     const headerManager = new HeaderManager(apiInstance);
-    const navItems = [
-        { href: '/profile', label: '👤 Mi perfil' }
-    ];
-    await headerManager.initialize(navItems);
+    await headerManager.initialize();
 
     const errorContainer = document.getElementById('errorContainer');
     let allFriends = [];
     let allFollowers = [];
     let friendRequests = [];
 
+    // ===== CARGAR DATOS =====
     async function loadFriends() {
         try {
             const data = await apiInstance.getFriendsFromAPI();
-            // Normalizar: si devuelve array, convertir a objeto
-            const normalized = Array.isArray(data) ? { success: true, friends: data } : data;
-            if (normalized.success && normalized.friends) {
-                allFriends = normalized.friends;
-                renderFriends();
-            }
+            allFriends = Array.isArray(data) ? data : (data.friends || []);
+            renderFriends();
         } catch (err) {
             console.error('Error loading friends:', err);
-            errorContainer.innerHTML = `<div class="error-message">Error al cargar amigos</div>`;
+            showError('Error al cargar amigos');
         }
     }
 
     async function loadFollowers() {
         try {
             const data = await apiInstance.getFollowers();
-            // Normalizar: si devuelve array, convertir a objeto
-            const normalized = Array.isArray(data) ? { success: true, followers: data } : data;
-            if (normalized.success && normalized.followers) {
-                allFollowers = normalized.followers;
-                renderFollowers();
-            }
+            allFollowers = Array.isArray(data) ? data : (data.followers || []);
+            renderFollowers();
         } catch (err) {
             console.error('Error loading followers:', err);
+            showError('Error al cargar seguidores');
         }
     }
 
     async function loadFriendRequests() {
         try {
             const data = await apiInstance.getFriendRequests();
-            // Normalizar: si devuelve array, convertir a objeto
-            const normalized = Array.isArray(data) ? { success: true, requests: data } : data;
-            if (normalized.success && normalized.requests) {
-                friendRequests = normalized.requests;
-                updateRequestBadge();
-                renderRequests();
-            }
+            friendRequests = Array.isArray(data) ? data : (data.requests || []);
+            updateRequestBadge();
+            renderRequests();
         } catch (err) {
             console.error('Error loading friend requests:', err);
+            showError('Error al cargar solicitudes');
         }
     }
 
@@ -72,7 +60,58 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Función auxiliar para cargar avatares Discord
+    // ===== ACCIONES =====
+    async function removeFriend(username) {
+        if (!confirm(`¿Está seguro de que desea eliminar a ${username} de sus amigos?`)) return;
+        try {
+            await apiInstance.deleteFriendFromAPI(username);
+            await loadFriends();
+            showSuccess(`${username} ha sido eliminado de tus amigos`);
+        } catch (err) {
+            console.error('Error removing friend:', err);
+            showError('Error al eliminar amigo');
+        }
+    }
+
+    async function acceptRequest(username) {
+        try {
+            const result = await apiInstance.acceptFriendRequest(username);
+            if (result.success || result.status === 'friendship_accepted') {
+                await loadFriendRequests();
+                await loadFriends();
+                showSuccess(`¡Ahora eres amigo de ${username}!`);
+            } else {
+                showError('Error al aceptar solicitud');
+            }
+        } catch (err) {
+            console.error('Error accepting request:', err);
+            showError('Error al aceptar solicitud');
+        }
+    }
+
+    async function rejectRequest(username) {
+        if (!confirm(`¿Descartar solicitud de ${username}?`)) return;
+        try {
+            await apiInstance.rejectFriendRequestFromAPI(username);
+            await loadFriendRequests();
+            showSuccess(`Solicitud de ${username} descartada`);
+        } catch (err) {
+            console.error('Error rejecting request:', err);
+            showError('Error al descartar solicitud');
+        }
+    }
+
+    function showError(msg) {
+        const container = document.getElementById('errorContainer');
+        container.innerHTML = `<div class="error-message">${msg}</div>`;
+        setTimeout(() => container.innerHTML = '', 3000);
+    }
+
+    function showSuccess(msg) {
+        console.log(msg);
+    }
+
+    // ===== CARGAR AVATARES =====
     async function loadAvatarForElement(element, username) {
         try {
             const profilePic = await apiInstance.getProfilePic(username);
@@ -84,6 +123,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // ===== RENDERIZAR =====
     function renderFriends(filtered = null) {
         const list = filtered || allFriends;
         const container = document.getElementById('friendsList');
@@ -98,31 +138,35 @@ window.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        container.innerHTML = list.map(friend => `
+        container.innerHTML = list.map(friend => {
+            const username = friend.username || friend;
+            return `
                 <div class="card">
                     <div class="friend-row">
-                        <div class="friend-info" onclick="window.location.href='/profile?user=${friend.username || friend}'">
+                        <div class="friend-info" onclick="window.location.href='/profile?user=${username}'" style="cursor: pointer;">
                             <img class="friend-avatar" 
-                                 data-username="${friend.username || friend}"
-                                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.username || friend}" 
-                                 alt="${friend.username || friend}">
+                                 data-username="${username}"
+                                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=${username}" 
+                                 alt="${username}">
                             <div class="friend-details">
-                                <div class="friend-name">${friend.username || friend}</div>
-                                <div class="friend-status">Amigo desde hace poco</div>
+                                <div class="friend-name">${username}</div>
+                                <div class="friend-status">Amigo</div>
                             </div>
                         </div>
                         <div class="friend-actions">
-                            <button class="btn-action btn-remove" onclick="removeFriend('${friend.username || friend}')">Eliminar</button>
+                            <button class="btn-action btn-remove" onclick="window.removeFriend('${username}')">Eliminar</button>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+        }).join('');
         
-        // Cargar avatares Discord
         document.querySelectorAll('.friend-avatar[data-username]').forEach(img => {
             loadAvatarForElement(img, img.dataset.username);
         });
-    }    function renderFollowers(filtered = null) {
+    }
+
+    function renderFollowers(filtered = null) {
         const list = filtered || allFollowers;
         const container = document.getElementById('followersList');
 
@@ -136,24 +180,26 @@ window.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        container.innerHTML = list.map(follower => `
-            <div class="card">
-                <div class="friend-row">
-                    <div class="friend-info" onclick="window.location.href='/profile?user=${follower.username || follower}'">
-                        <img class="friend-avatar" 
-                             data-username="${follower.username || follower}"
-                             src="https://api.dicebear.com/7.x/avataaars/svg?seed=${follower.username || follower}" 
-                             alt="${follower.username || follower}">
-                        <div class="friend-details">
-                            <div class="friend-name">${follower.username || follower}</div>
-                            <div class="friend-status">Te sigue</div>
+        container.innerHTML = list.map(follower => {
+            const username = follower.username || follower;
+            return `
+                <div class="card">
+                    <div class="friend-row">
+                        <div class="friend-info" onclick="window.location.href='/profile?user=${username}'" style="cursor: pointer;">
+                            <img class="friend-avatar" 
+                                 data-username="${username}"
+                                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=${username}" 
+                                 alt="${username}">
+                            <div class="friend-details">
+                                <div class="friend-name">${username}</div>
+                                <div class="friend-status">Te sigue</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
-        // Cargar avatares Discord
         document.querySelectorAll('.friend-avatar[data-username]').forEach(img => {
             loadAvatarForElement(img, img.dataset.username);
         });
@@ -172,112 +218,72 @@ window.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        container.innerHTML = friendRequests.map(request => `
-            <div class="card">
-                <div class="friend-row">
-                    <div class="friend-info" onclick="window.location.href='/profile?user=${request.username || request}'">
-                        <img class="friend-avatar" 
-                             data-username="${request.username || request}"
-                             src="https://api.dicebear.com/7.x/avataaars/svg?seed=${request.username || request}" 
-                             alt="${request.username || request}">
-                        <div class="friend-details">
-                            <div class="friend-name">${request.username || request}</div>
-                            <div class="friend-status">Solicitud de amistad</div>
+        container.innerHTML = friendRequests.map(request => {
+            const username = request.sender_username || request.username || request;
+            return `
+                <div class="card">
+                    <div class="friend-row">
+                        <div class="friend-info" onclick="window.location.href='/profile?user=${username}'" style="cursor: pointer;">
+                            <img class="friend-avatar" 
+                                 data-username="${username}"
+                                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=${username}" 
+                                 alt="${username}">
+                            <div class="friend-details">
+                                <div class="friend-name">${username}</div>
+                                <div class="friend-status">Solicitud pendiente</div>
+                            </div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="btn-action btn-accept" onclick="window.acceptRequest('${username}')">✓ Aceptar</button>
+                            <button class="btn-action btn-reject" onclick="window.rejectRequest('${username}')">✕ Rechazar</button>
                         </div>
                     </div>
-                    <div class="friend-actions">
-                        <button class="btn-action btn-accept" onclick="acceptFriendRequest('${request.username || request}')">Aceptar</button>
-                        <button class="btn-action btn-reject" onclick="rejectFriendRequest('${request.username || request}')">Rechazar</button>
-                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
-        // Cargar avatares Discord
         document.querySelectorAll('.friend-avatar[data-username]').forEach(img => {
             loadAvatarForElement(img, img.dataset.username);
         });
     }
 
-    // Global functions
-    window.removeFriend = async function(friendName) {
-        if (!confirm(`¿Eliminar a ${friendName} de amigos?`)) return;
-
-        try {
-            const data = await apiInstance.deleteFriendFromAPI(friendName);
-            if (data.success) {
-                allFriends = allFriends.filter(f => (f.username || f) !== friendName);
-                renderFriends();
-            } else {
-                alert(data.error || 'Error al eliminar amigo');
-            }
-        } catch (err) {
-            alert('Error: ' + err.message);
-        }
-    };
-
-    window.acceptFriendRequest = async function(username) {
-        try {
-            const data = await apiInstance.addFriendToAPI(username);
-            if (data.success) {
-                friendRequests = friendRequests.filter(r => (r.username || r) !== username);
-                allFriends.push({ username: username });
-                updateRequestBadge();
-                renderRequests();
-                renderFriends();
-            } else {
-                alert(data.error || 'Error al aceptar solicitud');
-            }
-        } catch (err) {
-            alert('Error: ' + err.message);
-        }
-    };
-
-    window.rejectFriendRequest = async function(username) {
-        try {
-            const data = await apiInstance.rejectFriendRequestFromAPI(username);
-            if (data.success) {
-                friendRequests = friendRequests.filter(r => (r.username || r) !== username);
-                updateRequestBadge();
-                renderRequests();
-            } else {
-                alert(data.error || 'Error al rechazar solicitud');
-            }
-        } catch (err) {
-            alert('Error: ' + err.message);
-        }
-    };
-
-    // Search functionality
-    document.getElementById('searchFriends').addEventListener('input', (e) => {
+    // ===== BÚSQUEDA =====
+    document.getElementById('searchFriends')?.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        const filtered = allFriends.filter(f => 
-            (f.username || f).toLowerCase().includes(query)
-        );
+        const filtered = allFriends.filter(f => {
+            const username = (f.username || f).toLowerCase();
+            return username.includes(query);
+        });
         renderFriends(filtered);
     });
 
-    document.getElementById('searchFollowers').addEventListener('input', (e) => {
+    document.getElementById('searchFollowers')?.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        const filtered = allFollowers.filter(f => 
-            (f.username || f).toLowerCase().includes(query)
-        );
+        const filtered = allFollowers.filter(f => {
+            const username = (f.username || f).toLowerCase();
+            return username.includes(query);
+        });
         renderFollowers(filtered);
     });
 
-    // Tab switching
+    // ===== TABS =====
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             
             tab.classList.add('active');
-            const tabName = tab.getAttribute('data-tab');
-            document.getElementById(tabName + 'Tab').style.display = 'block';
+            const tabContent = document.getElementById(tab.dataset.tab + 'Tab');
+            if (tabContent) tabContent.style.display = 'block';
         });
     });
 
-    // Load data
+    // ===== HACER DISPONIBLES GLOBALMENTE =====
+    window.removeFriend = removeFriend;
+    window.acceptRequest = acceptRequest;
+    window.rejectRequest = rejectRequest;
+
+    // ===== CARGAR DATOS INICIALES =====
     await loadFriends();
     await loadFollowers();
     await loadFriendRequests();

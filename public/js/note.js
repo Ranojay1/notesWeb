@@ -119,7 +119,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
 
         commentsList.innerHTML = comments.map(comment => {
-            const date = new Date(comment.created_at || comment.date || Date.now());
             const author = comment.username || 'Anónimo';
             
             return `
@@ -132,13 +131,9 @@ window.addEventListener('DOMContentLoaded', async () => {
                              onclick="window.location.href='/profile?user=${author}'">
                         <div class="comment-info">
                             <span class="comment-author" onclick="window.location.href='/profile?user=${author}'">${author}</span>
-                            <span class="comment-time">${date.toLocaleDateString('es-ES')} ${date.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}</span>
                         </div>
                     </div>
-                    <div class="comment-text">${comment.comment || comment.text}</div>
-                    <div class="comment-actions-small">
-                        <span class="comment-action">❤️ ${comment.likes || 0}</span>
-                    </div>
+                    <div class="comment-text">${comment.content || comment.comment || comment.text || ''}</div>
                 </div>
             `;
         }).join('');
