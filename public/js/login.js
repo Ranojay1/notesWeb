@@ -23,11 +23,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                 console.log('Discord user linked to:', data.username);
                 
                 try {
-                    // Obtener el discordId del objeto correcto
                     const discordId = data.discordId || (data.discord && data.discord.id);
                     console.log('🔑 Discord ID extracted:', discordId);
-                    console.log('🔍 data.discordId:', data.discordId);
-                    console.log('🔍 data.discord:', data.discord);
                     
                     if (!discordId) {
                         throw new Error('Discord ID not found in login data');
@@ -45,13 +42,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
                     const loginResult = await response.json();
                     
-                    if (loginResult.success) {
-                        // Guardar en localStorage con un identificador especial
+                    if (loginResult.success && loginResult.accessToken && loginResult.refreshToken) {
+                        // ✅ SEGURO: Guardar tokens JWT en lugar de Discord ID
                         localStorage.setItem('user', data.username);
-                        localStorage.setItem('pass', 'DISCORD_' + discordId);
+                        localStorage.setItem('accessToken', loginResult.accessToken);
+                        localStorage.setItem('refreshToken', loginResult.refreshToken);
                         localStorage.setItem('discord_auth', 'true');
                         
-                        console.log('✅ Discord login successful, redirecting...');
+                        console.log('✅ Discord login successful with JWT tokens, redirecting...');
                         window.location.href = '/';
                     } else {
                         throw new Error(loginResult.error || 'Discord login failed');

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Política de Cookies — Thinkverse</title>
+  <title>Política de Almacenamiento Local — Thinkverse</title>
   <link rel="stylesheet" href="/css/style.css">
-  <meta name="description" content="Política de cookies de Thinkverse: tipos de cookies, finalidad y cómo gestionarlas">
+  <meta name="description" content="Política de almacenamiento local de Thinkverse: qué datos guardamos en tu navegador y cómo gestionarlos">
   <style>
     /* Pequeños ajustes locales para el panel de cookies */
     .cookie-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px }
@@ -28,50 +28,124 @@
 
   <main class="container">
     <div class="content cookie-section">
-      <h1>Política de Cookies</h1>
-  <p>En Thinkverse utilizamos cookies y tecnologías similares para ofrecer, proteger y mejorar nuestro servicio. Esta política explica qué cookies usamos, por qué y cómo puedes gestionarlas.</p>
+      <h1>Política de Almacenamiento Local</h1>
+  <p><strong>Thinkverse no utiliza cookies.</strong> En su lugar, empleamos LocalStorage del navegador para funcionalidades esenciales. Esta política explica qué datos almacenamos localmente y cómo gestionarlos.</p>
 
-      <h2 id="what">1. ¿Qué son las cookies?</h2>
-      <p>Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas una web. Pueden ser temporales (de sesión) o persistentes y pueden provenir del sitio que visitas (propias) o de servicios externos (terceros).</p>
+      <h2 id="what">1. ¿Qué es LocalStorage?</h2>
+      <p>LocalStorage es una tecnología del navegador que permite almacenar datos en tu dispositivo de forma permanente (hasta que los elimines manualmente o cierres sesión). A diferencia de las cookies, estos datos no se envían automáticamente al servidor en cada petición.</p>
 
-      <h2 id="why">2. ¿Por qué usamos cookies?</h2>
-      <p>Este sitio solo utiliza <strong>cookies necesarias</strong> para el funcionamiento técnico de la plataforma: autenticación, gestión de sesión y medidas básicas de seguridad. No usamos cookies de analítica ni de publicidad.</p>
+      <h2 id="why">2. ¿Por qué usamos LocalStorage?</h2>
+      <p>Utilizamos LocalStorage <strong>exclusivamente para datos necesarios</strong> que mejoran tu experiencia:</p>
+      <ul>
+        <li><strong>Mantener tu sesión activa:</strong> no tienes que iniciar sesión cada vez que visitas el sitio.</li>
+        <li><strong>Recordar tus preferencias:</strong> tema oscuro/claro según tu elección.</li>
+        <li><strong>Autenticación segura:</strong> gestionar inicio de sesión con contraseña o Discord OAuth.</li>
+      </ul>
+      <p>No usamos estos datos con fines publicitarios ni los compartimos con terceros.</p>
 
-      <h2 id="table">3. Cookies que empleamos</h2>
-      <p>Solo se usan cookies estrictamente necesarias. A continuación se muestra un resumen:</p>
+      <h2 id="table">3. Datos que almacenamos localmente</h2>
       <table class="cookie-table" aria-describedby="table-desc">
-        <caption id="table-desc" style="text-align:left; caption-side:top; font-weight:600; padding-bottom:6px">Resumen de cookies</caption>
+        <caption id="table-desc" style="text-align:left; caption-side:top; font-weight:600; padding-bottom:6px">Datos en LocalStorage (Actualizado Nov 2025)</caption>
         <thead>
-          <tr><th>Tipo</th><th>Ejemplo / Nombre</th><th>Finalidad</th><th>Retención</th></tr>
+          <tr><th>Clave</th><th>Finalidad</th><th>Tipo</th><th>Retención</th></tr>
         </thead>
         <tbody>
-          <tr><td>Necesarias</td><td>session / auth</td><td>Mantener sesión iniciada y seguridad</td><td>Sesión</td></tr>
+          <tr>
+            <td><code>user</code></td>
+            <td>Nombre de usuario para identificar sesión</td>
+            <td>Necesario</td>
+            <td>Hasta cerrar sesión</td>
+          </tr>
+          <tr>
+            <td><code>accessToken</code></td>
+            <td>Token JWT de acceso para autenticación segura (firmado criptográficamente)</td>
+            <td>Necesario</td>
+            <td>15 minutos (auto-renovable)</td>
+          </tr>
+          <tr>
+            <td><code>refreshToken</code></td>
+            <td>Token JWT para renovar accessToken sin relogin</td>
+            <td>Necesario</td>
+            <td>7 días o hasta cerrar sesión</td>
+          </tr>
+          <tr>
+            <td><code>theme</code></td>
+            <td>Preferencia de tema (dark/light)</td>
+            <td>Funcional</td>
+            <td>Permanente (hasta que lo cambies)</td>
+          </tr>
+          <tr>
+            <td><code>discord_auth</code></td>
+            <td>Indicador de autenticación mediante Discord OAuth</td>
+            <td>Funcional</td>
+            <td>Hasta cerrar sesión</td>
+          </tr>
         </tbody>
       </table>
 
-  <h2 id="consent">4. Consentimiento y base legal</h2>
-  <p>Las <strong>cookies necesarias</strong> son imprescindibles para el servicio (autenticación, sesión y seguridad) y se instalan siempre. Este sitio no utiliza cookies de analítica ni de publicidad; por tanto, no solicitamos consentimiento para esas finalidades.</p>
+      <div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px; margin: 16px 0; border-radius: 4px;">
+        <p style="margin: 0; color: #155724;"><strong>🔒 Mejora de seguridad (Nov 2025):</strong> Hemos migrado a <strong>autenticación basada en tokens JWT</strong>. Esto significa:</p>
+        <ul style="color: #155724; margin-top: 8px; margin-bottom: 0;">
+          <li>Ya no almacenamos Discord IDs ni contraseñas localmente</li>
+          <li>Los tokens expiran automáticamente (15 min/7 días)</li>
+          <li>No se pueden falsificar (firmados con clave secreta del servidor)</li>
+          <li>Se invalidan inmediatamente al cerrar sesión</li>
+          <li>Renovación automática transparente (no más relogins frecuentes)</li>
+        </ul>
+      </div>
 
-      <h2 id="manage">5. Eliminación y control manual</h2>
-      <p>Si prefieres no usar cookies, puedes eliminarlas desde la configuración de tu navegador. Ten en cuenta que eliminar cookies de sesión provocará el cierre de sesión y la pérdida de preferencias temporales.</p>
+  <h2 id="consent">4. Base legal y consentimiento</h2>
+  <p>Los tokens JWT (<strong>accessToken, refreshToken</strong>) son estrictamente necesarios para autenticación segura y se generan automáticamente al iniciar sesión (base legal: ejecución del contrato y seguridad).</p>
+  <p>El dato de <strong>preferencia de tema</strong> se almacena según tu elección y detecta automáticamente la preferencia de tu sistema operativo la primera vez (base legal: consentimiento implícito y mejora de experiencia).</p>
 
-  <h2 id="retention">6. Conservación y eliminación</h2>
-  <p>Las cookies necesarias se eliminan al cerrar la sesión o al terminar la sesión del navegador. Puedes eliminarlas desde las opciones de tu navegador si lo deseas; esto puede provocar la pérdida de la sesión activa.</p>
+      <h2 id="manage">5. Cómo gestionar y eliminar estos datos</h2>
+      <p>Puedes eliminar los datos almacenados localmente de las siguientes formas:</p>
+      <ul>
+        <li><strong>Cerrar sesión en Thinkverse:</strong> elimina automáticamente <code>user</code>, <code>accessToken</code>, <code>refreshToken</code> y <code>discord_auth</code>.</li>
+        <li><strong>Desde tu navegador:</strong>
+          <ul>
+            <li><strong>Chrome/Edge:</strong> F12 → Application → Local Storage → thinkverse.site → eliminar claves.</li>
+            <li><strong>Firefox:</strong> F12 → Almacenamiento → Almacenamiento local → thinkverse.site.</li>
+            <li><strong>Safari:</strong> Preferencias → Avanzado → Datos del sitio web.</li>
+          </ul>
+        </li>
+        <li><strong>Limpiar datos del navegador:</strong> al limpiar datos de navegación (cookies y datos del sitio), se eliminará también LocalStorage.</li>
+      </ul>
+      <p><strong>Nota:</strong> eliminar estos datos cerrará tu sesión y perderás tus preferencias de tema. Los tokens expirados se invalidan automáticamente en el servidor.</p>
 
-  <h2 id="rights">7. Tus derechos</h2>
-  <p>Tienes derecho a acceder, rectificar y suprimir tus datos, así como a oponerte o limitar su tratamiento cuando proceda. Para ejercer tus derechos, contacta en <a href="mailto:privacy@thinkverse.site">privacy@thinkverse.site</a>.</p>
+  <h2 id="security">6. Seguridad de los datos locales</h2>
+  <p>Los datos en LocalStorage están protegidos por el mismo origen (same-origin policy), lo que significa que solo Thinkverse puede acceder a ellos. Sin embargo:</p>
+  <ul>
+    <li>Son accesibles desde JavaScript del navegador (por diseño).</li>
+    <li>No están cifrados por el navegador (usa contraseñas seguras).</li>
+    <li>Pueden ser vulnerables a ataques XSS si el sitio no está bien protegido (aplicamos todas las medidas de seguridad).</li>
+  </ul>
+
+  <h2 id="third-party">7. Servicios de terceros</h2>
+  <p>Thinkverse utiliza <strong>Discord OAuth</strong> (opcional) para autenticación. Cuando vinculas tu cuenta de Discord:</p>
+  <ul>
+    <li>Discord proporciona tu Discord ID y avatar según sus <a href="https://discord.com/privacy" target="_blank" rel="noopener">Políticas de Privacidad</a>.</li>
+    <li>Almacenamos tu Discord ID localmente (con prefijo "DISCORD_") para mantener la sesión.</li>
+    <li>No compartimos tus datos con Discord más allá de la autenticación inicial.</li>
+  </ul>
+
+  <h2 id="rights">8. Tus derechos</h2>
+  <p>Tienes derecho a acceder, rectificar, eliminar o limitar el uso de tus datos. Para ejercer tus derechos sobre datos almacenados en el servidor (no LocalStorage), contacta en <a href="mailto:privacy@thinkverse.site">privacy@thinkverse.site</a>.</p>
 
       <h2 id="contact">9. Contacto</h2>
-  <p>Si tienes preguntas sobre esta política de cookies, escríbenos a <a href="mailto:privacy@thinkverse.site">privacy@thinkverse.site</a>.</p>
+  <p>Si tienes preguntas sobre el uso de LocalStorage o privacidad, escríbenos a <a href="mailto:privacy@thinkverse.site">privacy@thinkverse.site</a>.</p>
 
-      <p style="margin-top:18px;color:var(--text-secondary);font-size:13px;">Última actualización: 14 de septiembre de 2025.</p>
+      <p style="margin-top:32px;color:var(--text-secondary);font-size:13px;">Última actualización: 16 de noviembre de 2025.</p>
     </div>
   </main>
 
 
         <footer class="site-footer" style="margin-top:48px; text-align:center; color:var(--text-secondary);">
-            <small>&copy; <span id="year"></span> Thinkverse — <a href="/html/privacy.html">Política de privacidad</a> • <a href="/html/cookies.html">Cookies</a></small>
+            <small>&copy; <span id="year"></span> Thinkverse — <a href="/privacy">Política de privacidad</a> • <a href="/cookies">Almacenamiento local</a></small>
         </footer>
 
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
